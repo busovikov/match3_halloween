@@ -32,7 +32,9 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
         collider = GetComponent<BoxCollider2D>();
         collider.size = new Vector2(width, height);
-        collider.offset = -transform.position;
+        collider.offset = collider.size / 2 - Vector2.one / 2;
+        Camera.main.transform.position += (Vector3)collider.offset;
+        Camera.main.orthographicSize = Math.Max(width, (float)height / 2);
         tiles = new GameObject[width, height];
         
         List<int> types = Enumerable.Range(0, TilePool.Length).Select((index) => index).ToList();
@@ -79,7 +81,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
     private void SetPosition(Vector2 position)
     {
-        Vector2 offsetPosition = GetArrayPosition(position + collider.offset);
+        Vector2 offsetPosition = GetArrayPosition(position - (Vector2)collider.transform.position);
         if (!processing && actionAllowed && firstPosition != offsetPosition)
         {
 

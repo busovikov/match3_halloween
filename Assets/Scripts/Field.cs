@@ -22,6 +22,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
     private GameObject[,] tiles;
     private HashSet<Vector2> toBeDestroyed;
+    private HashSet<Vector2> toCheckForMatch;
     private bool processing = false;
     private bool actionAllowed = true;
 
@@ -29,6 +30,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     void Awake()
     {
         toBeDestroyed = new HashSet<Vector2>();
+        toCheckForMatch = new HashSet<Vector2>();
 
         collider = GetComponent<BoxCollider2D>();
         collider.size = new Vector2(width, height);
@@ -144,12 +146,11 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private IEnumerator Processing()
     {
         processing = true;
-        
+
         while (toBeDestroyed.Count > 0)
         {
             int[] destroyedCount = new int[width];
             int[] topElement = new int[width];
-            var toCheck = new HashSet<Vector2>();
 
             foreach (var item in toBeDestroyed)
             {
@@ -165,7 +166,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             {
                 if (topElement[x] > 0)
                 {
-                    dropAll.Add(StartCoroutine(DropAndReplaceWithNew(x, topElement[x], destroyedCount[x], toCheck)));
+                    dropAll.Add(StartCoroutine(DropAndReplaceWithNew(x, topElement[x], destroyedCount[x], toCheckForMatch)));
                 }
             }
 
@@ -174,11 +175,21 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                 yield return dropTask;
             }
 
-            foreach (var dropPosition in toCheck)
+            List<Vector2> checkedTiles = new List<Vector2>();
+            foreach (var dropPosition in toCheckForMatch)
             {
-                CheckMatch(Vector2.down, dropPosition);
+                if (CheckMatch(Vector2.down, dropPosition))
+                {
+                    break;
+                };
+            }
+
+            foreach (var tile in checkedTiles)
+            {
+                toCheckForMatch.Remove(tile);
             }
         }
+
         processing = false;
     }
 
@@ -216,7 +227,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             yield return animation;
         }
 
-        yield return new WaitForSeconds(1f); 
+        yield return new WaitForSeconds(.2f); 
     }
 
     private bool IsValid(Vector2 arrayPosition)

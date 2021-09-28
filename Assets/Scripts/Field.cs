@@ -36,7 +36,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         collider.size = new Vector2(width, height);
         collider.offset = collider.size / 2 - Vector2.one / 2;
         Camera.main.transform.position += (Vector3)collider.offset;
-        Camera.main.orthographicSize = Math.Max(width, (float)height / 2);
+        Camera.main.orthographicSize = Math.Max(width, (float)height / 2) + 1;
         tiles = new GameObject[width, height];
         
         List<int> types = Enumerable.Range(0, TilePool.Length).Select((index) => index).ToList();
@@ -149,13 +149,8 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
         while (toBeDestroyed.Count > 0)
         {
-            int[] destroyedCount = new int[width];
-            int[] topElement = new int[width];
-
             foreach (var item in toBeDestroyed)
             {
-                destroyedCount[(int)item.x]++;
-                topElement[(int)item.x] = Math.Max(topElement[(int)item.x], (int)item.y + 1);
                 GetTile(item).DestroyContent();
             }
 
@@ -164,10 +159,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             List<Coroutine> dropAll = new List<Coroutine>();
             for (int x = 0; x < width; x++)
             {
-                if (topElement[x] > 0)
-                {
-                    dropAll.Add(StartCoroutine(DropAndReplaceWithNew(x, topElement[x], destroyedCount[x], toCheckForMatch)));
-                }
+                 dropAll.Add(StartCoroutine(DropAndReplaceWithNew(x, toCheckForMatch)));
             }
 
             foreach (Coroutine dropTask in dropAll)
@@ -190,19 +182,72 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             }
         }
 
+        if (!PossibleMatchExists())
+        {
+            yield return Reshufle();
+        }
+
         processing = false;
     }
 
-    private IEnumerator DropAndReplaceWithNew(int x, int topElement, int destroyedCount, HashSet<Vector2> toCheck)
+    private IEnumerator Reshufle()
+    {
+        int processing = 0;
+        var until = new WaitUntil(() => processing == 0);
+        List<int> axis_y = Enumerable.Range(0, height).Select((index) => index).ToList();
+        List<List<int>> remainingPositions = new List<List<int>>();
+
+        for (int i = 0; i < width; i++)
+        {
+            remainingPositions.Add(new List<int>(axis_y));
+        }
+
+        int swap_x = 0;
+        int swap_y = 0;
+        bool swap = false;
+        while (remainingPositions.Count > 0)
+        {
+            var new_x = UnityEngine.Random.Range(0, remainingPositions.Count);
+            var new_y = UnityEngine.Random.Range(0, remainingPositions[new_x].Count);
+            remainingPositions[new_x].RemoveAt(new_y);
+            if (remainingPositions[new_x].Count == 0)
+            {
+                remainingPositions.RemoveAt(new_x);
+            }
+
+            if (swap)
+            {
+                processing++;
+                GetTile(swap_x, swap_y).ExchangeWith(GetTile(new_x, new_y), ()=> { processing--; });
+            }
+            else 
+            {
+                swap_x = new_x;
+                swap_y = new_y;
+            }
+
+            swap = !swap;
+        }
+
+        yield return until;
+    }
+
+    private IEnumerator DropAndReplaceWithNew(int x, HashSet<Vector2> toCheck)
     {
         List<Coroutine> animations = new List<Coroutine>();
+        int destroyedCount = 0;
 
-        for (int y = topElement; y < height; y++)
+        for (int y = 0; y < height; y++)
         {
-            if (destroyedCount > 0)
+            Tile tile = GetTile(x, y);
+            if (tile.content == null)
+            {
+                destroyedCount++;
+            }
+            else if (destroyedCount > 0)
             {
                 var dropPosition = new Vector2(x, y - destroyedCount);
-                animations.Add(GetTile(new Vector2(x, y)).DropTo(GetTile(dropPosition)));
+                animations.Add(GetTile(x, y).DropTo(GetTile(dropPosition)));
                 toCheck.Add(dropPosition);
                 yield return null;
             }
@@ -230,6 +275,26 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         yield return new WaitForSeconds(.2f); 
     }
 
+    private bool PossibleMatchExists()
+    {
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+            {
+                var position = new Vector2(x, y);
+                var next = new Vector2(x, y + 1);
+                if (GetType(position) == GetType(next) && (CheckPotentialMatch(position, Vector2.down) || CheckPotentialMatch(next, Vector2.up)))
+                {
+                    return true;
+                }
+                next = new Vector2(x + 1, y);
+                if (GetType(position) == GetType(next) && (CheckPotentialMatch(position, Vector2.left) || CheckPotentialMatch(next, Vector2.right)))
+                {
+                    return true;
+                }
+            }
+        return false;
+    }
+
     private bool IsValid(Vector2 arrayPosition)
     {
         return arrayPosition.y >= 0 && arrayPosition.y < height && arrayPosition.x >= 0 && arrayPosition.x < width;
@@ -237,7 +302,11 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
     Tile GetTile(Vector2 position)
     {
-        return tiles[(int)position.x, (int)position.y].GetComponent<Tile>();
+        return GetTile((int)position.x, (int)position.y);
+    }
+    Tile GetTile(int x, int y)
+    {
+        return tiles[x, y].GetComponent<Tile>();
     }
     private int GetType(Vector2 arrayPosition)
     {
@@ -251,6 +320,17 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         return new Vector2((float)Math.Round(position.x),(float)Math.Round(position.y));
     }
 
+    private bool CheckPotentialMatch(Vector2 direction, Vector2 position)
+    {
+        var type = GetType(position);
+
+        Vector2 right = new Vector2(direction.y, direction.x);
+        Vector2 left = -right;
+
+        return GetType(position + direction) == type ||
+            GetType(position + left) == type ||
+            GetType(position + right) == type;
+    }
     private bool CheckMatch(Vector2 direction, Vector2 position)
     {
         var type = GetType(position);

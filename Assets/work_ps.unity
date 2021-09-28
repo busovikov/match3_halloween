@@ -319,14 +319,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 962e0a57d0a49664a8747da2db5dc7fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 8
-  height: 13
+  width: 4
+  height: 4
   prefab: {fileID: 4612849928330980996, guid: 68327ec6764c8f04da004d4324f9d13e, type: 3}
   TilePool:
-  - {fileID: 7708312500826636749, guid: d176aeb3d1bb0d641ae1fcf0b8c38d6b, type: 3}
-  - {fileID: 7340732682772682641, guid: 68c9ca3d37dc3e84e96cb755ae51c8dd, type: 3}
-  - {fileID: 4417858742204839665, guid: 12b5eae1fb0dbff4282aeeb03655779f, type: 3}
-  - {fileID: 1064390013883685460, guid: 60709a5e477fe1641bc00fe34fc6ea3a, type: 3}
+  - {fileID: 2776563623882526607, guid: 0df0a4ec8891b694d8301b1c0a76bbee, type: 3}
+  - {fileID: 4981260845199237724, guid: a026295ab2e131a4bb9e6136ff2a9e96, type: 3}
+  - {fileID: 1963602528608903061, guid: af36346a375ddba42aa3c2adbcc250e3, type: 3}
+  - {fileID: 6552289192439298417, guid: 10468f264e6a46048b2b91f1d96b71c0, type: 3}
 --- !u!4 &2087207203
 Transform:
   m_ObjectHideFlags: 0

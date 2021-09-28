@@ -5,7 +5,7 @@ using System;
 
 public class Tile : MonoBehaviour
 {
-    private GameObject content;
+    public GameObject content;
     public int tileType;
 
     public void ExchangeWith(Tile other, Action onExchanged)

@@ -167,18 +167,9 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                 yield return dropTask;
             }
 
-            List<Vector2> checkedTiles = new List<Vector2>();
             foreach (var dropPosition in toCheckForMatch)
             {
-                if (CheckMatch(Vector2.down, dropPosition))
-                {
-                    break;
-                };
-            }
-
-            foreach (var tile in checkedTiles)
-            {
-                toCheckForMatch.Remove(tile);
+                CheckMatch(Vector2.down, dropPosition);
             }
         }
 

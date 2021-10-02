@@ -7,7 +7,6 @@ public class Tile : MonoBehaviour
 {
     public GameObject content;
     public int tileType;
-
     public void ExchangeWith(Tile other, Action onExchanged)
     {
         if (content == null || other.content == null)
@@ -26,7 +25,6 @@ public class Tile : MonoBehaviour
 
         StartCoroutine(SyncContent(other, onExchanged));
     }
-
     public IEnumerator SyncContent(Tile other, Action onExchanged)
     {
         var until = new WaitUntil(() => IsSet() && other.IsSet());
@@ -38,7 +36,6 @@ public class Tile : MonoBehaviour
             onExchanged();
         }
     }
-
     public bool IsSet()
     {
         return transform.position == content.transform.position;
@@ -56,7 +53,6 @@ public class Tile : MonoBehaviour
             content.transform.position = Vector3.Lerp(InitialOffset, transform.position, weight);
         } while (!IsSet());
     }
-
     public void DestroyContent()
     {
         StopCoroutine(SwapAnimation());
@@ -64,7 +60,6 @@ public class Tile : MonoBehaviour
         Destroy(content);
         content = null;
     }
-
     public Coroutine DropTo(Tile tileToDrop)
     {
         if (content != null)
@@ -79,11 +74,10 @@ public class Tile : MonoBehaviour
         }
         return null;
     }
-
-    public static Coroutine CreateContent(Tile tile, GameObject prefab, int index, Vector3 position = default)
+    public Coroutine CreateContent( GameObject prefab, int index, Vector3 offset = default)
     {
-        tile.content = Instantiate(prefab, tile.transform.position + position, Quaternion.identity, tile.transform);
-        tile.tileType = index;
-        return tile.StartCoroutine(tile.SwapAnimation());
+        content = Instantiate(prefab, transform.position + offset, Quaternion.identity, transform);
+        tileType = index;
+        return StartCoroutine(SwapAnimation());
     }
 }

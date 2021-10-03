@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 264b75c312a6500458d74e9f05bf3bc0
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Coda
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 062263ecf1f715747afe8d04810c9e16, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

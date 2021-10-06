@@ -12,6 +12,7 @@ TagManager:
   - 
   - Water
   - UI
+  - 
   - Game Elements
   - Swapping
   - 
@@ -37,8 +38,19 @@ TagManager:
   - 
   - 
   - 
-  - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 721357047
+    locked: 0
+  - name: Clouds
+    uniqueID: 4039837587
+    locked: 0
+  - name: Light
+    uniqueID: 4025091903
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: UI
+    uniqueID: 3695681915
     locked: 0

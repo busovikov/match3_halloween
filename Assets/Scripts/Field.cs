@@ -13,6 +13,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private Match match;
     private bool processing = false;
     private bool actionAllowed = true;
+    private Score score;
 
     // Start is called before the first frame update
     void Awake()
@@ -20,13 +21,13 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         tileMap = GetComponent<TileMap>();
         match = new Match(tileMap);
 
-        
+        score = FindObjectOfType<Score>();
 
         collider = GetComponent<BoxCollider2D>();
         collider.size = new Vector2(tileMap.width, tileMap.height);
         collider.offset = collider.size / 2 - Vector2.one / 2;
-        Camera.main.transform.position += (Vector3)collider.offset;
-        Camera.main.orthographicSize = Math.Max(tileMap.width, (float)tileMap.height / 2) + 1;
+        //Camera.main.transform.position += (Vector3)collider.offset;
+        //Camera.main.orthographicSize = Math.Max(tileMap.width, (float)tileMap.height / 2) + 1;
     }
 
     private void Start()
@@ -79,7 +80,8 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     }
     public void OnPointerDown(PointerEventData eventData)
     {
-        SetPosition(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        SetPosition(eventData.pointerCurrentRaycast.worldPosition);
+        //SetPosition(Camera.main.ScreenToWorldPoint(Input.mousePosition));
     }
     public void OnPointerUp(PointerEventData eventData)
     {
@@ -87,7 +89,8 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     }
     public void OnDrag(PointerEventData eventData)
     {
-        SetPosition(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        SetPosition(eventData.pointerCurrentRaycast.worldPosition);
+        //SetPosition(Camera.main.ScreenToWorldPoint(Input.mousePosition));
     }
     private IEnumerator ProcessingOnStart()
     {
@@ -109,6 +112,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             match.ExecuteAndClear((item) =>
             {
                 item.DestroyContent();
+                score.AddScore(50);
             });
 
             List<Coroutine> dropAll = new List<Coroutine>();

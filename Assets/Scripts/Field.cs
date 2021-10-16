@@ -112,7 +112,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             match.ExecuteAndClear((item) =>
             {
                 item.DestroyContent();
-                score.AddScore(50);
+                score.AddScore(1);
             });
 
             List<Coroutine> dropAll = new List<Coroutine>();
@@ -201,7 +201,8 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         {
             var position = new Vector2(x, tileMap.height - destroyedCount + i);
             var offset = new Vector2(0, destroyedCount);
-            animations.Add(tileMap.Create(position, offset));
+            bool dropped = true;
+            animations.Add(tileMap.Create(position, offset, dropped));
             yield return null;
         }
 

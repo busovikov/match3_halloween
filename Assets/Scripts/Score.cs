@@ -5,8 +5,9 @@ using UnityEngine.UI;
 
 public class Score : MonoBehaviour
 {
-    public float duration = 1f;
+    public float duration = .3f;
     private float score = 0;
+    float remaining = 0;
     private Text element;
 
     void Awake()
@@ -16,18 +17,15 @@ public class Score : MonoBehaviour
 
     public void AddScore(int val)
     {
-        StartCoroutine(Adding(val));
+        remaining += val;
     }
 
     // Update is called once per frame
-    IEnumerator Adding(int val)
+    private void Update()
     {
-        //var buffer = 0;
-        float remaining = val;
-        while (remaining > 0)
+        if (remaining > 0)
         {
-            float part = Mathf.Lerp(0, val, Time.deltaTime / duration );
-            Debug.Log("Part: " + part);
+            float part = Time.deltaTime * 5;
             if (remaining <= part)
             {
                 score += remaining;
@@ -38,9 +36,8 @@ public class Score : MonoBehaviour
                 score += part;
                 remaining -= part;
             }
-            
+
             element.text = score.ToString("0");
-            yield return null;
         }
     }
 }

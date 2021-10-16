@@ -16,7 +16,6 @@ public class Match
     }
     public bool ToBeDestroyed()
     {
-        Debug.Log("To be destroyed: " + toBeDestroyed.Count.ToString());
         return toBeDestroyed.Count > 0;
     }
     public void ExecuteAndClear(Action<Tile> callback)
@@ -114,8 +113,6 @@ public class Match
     }
     private void StackOn(int x, int y, List<Vector2> set)
     {
-        Debug.Log("Check x: " + x.ToString() + " y: " + y.ToString());
-        
         if (set.Count > 0 && tiles.GetType(set[0]) != tiles.GetType(x, y))
         {
             Sink(set);
@@ -124,7 +121,6 @@ public class Match
         var s = "";
         foreach (var i in set)
             s += " " + i.ToString();
-        Debug.Log(" Stack:" + s);
     }
 
     private void Sink(List<Vector2> set)

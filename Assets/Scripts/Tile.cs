@@ -5,8 +5,16 @@ using System;
 
 public class Tile : MonoBehaviour
 {
+    [SerializeField]
+    public GameObject container;
     public GameObject content;
     public int tileType;
+
+    private Animator animator;
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
     public void ExchangeWith(Tile other, Action onExchanged)
     {
         if (content == null || other.content == null)
@@ -16,8 +24,8 @@ public class Tile : MonoBehaviour
         other.content = this.content;
         content = tmp;
 
-        content.transform.SetParent(transform);
-        other.content.transform.SetParent(other.transform);
+        content.transform.SetParent(container.transform);
+        other.content.transform.SetParent(other.container.transform);
 
         var type = other.tileType;
         other.tileType = tileType;
@@ -38,20 +46,26 @@ public class Tile : MonoBehaviour
     }
     public bool IsSet()
     {
-        return transform.position == content.transform.position;
+        return container.transform.position == content.transform.position;
     }
-    public IEnumerator SwapAnimation()
+    public IEnumerator SwapAnimation(Action onMoved = null)
     {
         float elapsed = 0f;
         var InitialOffset = content.transform.position;
-        float path = (InitialOffset - transform.position).magnitude / 10;
+        float path = (InitialOffset - container.transform.position).magnitude / 10;
         do
         {
             yield return null;
             elapsed += Time.deltaTime;
             var weight = Math.Min(1, elapsed / 0.2f);
-            content.transform.position = Vector3.Lerp(InitialOffset, transform.position, weight);
+            content.transform.position = Vector3.Lerp(InitialOffset, container.transform.position, weight);
         } while (!IsSet());
+
+        yield return null;
+        if (onMoved != null)
+        {
+            onMoved();
+        }
     }
     public void DestroyContent()
     {
@@ -66,18 +80,23 @@ public class Tile : MonoBehaviour
         {
             tileToDrop.content = content;
             tileToDrop.tileType = tileType;
-            tileToDrop.content.transform.SetParent(tileToDrop.transform);
+            tileToDrop.content.transform.SetParent(tileToDrop.container.transform);
 
             content = null;
             tileType = 0;
-            return StartCoroutine(tileToDrop.SwapAnimation());
+            return StartCoroutine(tileToDrop.SwapAnimation(()=> { tileToDrop.animator.SetTrigger("Dropped"); }));
         }
         return null;
     }
-    public Coroutine CreateContent( GameObject prefab, int index, Vector3 offset = default)
+    public Coroutine CreateContent( GameObject prefab, int index, bool dropped, Vector3 offset = default)
     {
-        content = Instantiate(prefab, transform.position + offset, Quaternion.identity, transform);
+        content = Instantiate(prefab, container.transform.position + offset, Quaternion.identity, container.transform);
         tileType = index;
-        return StartCoroutine(SwapAnimation());
+        Action callback = null;
+        if (dropped)
+        {
+            callback = () => { animator.SetTrigger("Dropped"); };
+        }
+        return StartCoroutine(SwapAnimation(callback));
     }
 }

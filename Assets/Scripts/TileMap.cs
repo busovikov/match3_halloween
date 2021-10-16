@@ -32,10 +32,10 @@ public class TileMap : MonoBehaviour
             }
     }
 
-    public Coroutine Create(Vector2 position, Vector2 offset)
+    public Coroutine Create(Vector2 position, Vector2 offset, bool dropped = false)
     {
         var index = UnityEngine.Random.Range(0, TilePool.Length);
-        return GetTile(position).CreateContent(TilePool[index], index, offset);
+        return GetTile(position).CreateContent(TilePool[index], index, dropped, offset);
     }
     private void InitContent(int x, int y, List<int> types)
     {
@@ -53,7 +53,8 @@ public class TileMap : MonoBehaviour
         }
 
         var index = allowedTypes[UnityEngine.Random.Range(0, allowedTypes.Count)];
-        GetTile(position).CreateContent(TilePool[index], index);
+        const bool dropped = false;
+        GetTile(position).CreateContent(TilePool[index], index, dropped);
     }
 
     public Tile GetTile(Vector2 position)

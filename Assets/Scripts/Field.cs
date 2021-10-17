@@ -34,14 +34,13 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
     private void Start()
     {
-        var loader = FindObjectOfType<LevelLoader>();
-        if (loader.mode == LevelLoader.GameMode.Moves)
+        if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
         {
-            timeAndMoves.StartAsMoves(15);
+            timeAndMoves.StartAsMoves(LevelLoader.Instance.levelMoves);
         }
         else
         {
-            timeAndMoves.StartAsSeconds(60);
+            timeAndMoves.StartAsSeconds(LevelLoader.Instance.levelTime);
         }
         StartCoroutine(ProcessingOnStart());
     }
@@ -120,7 +119,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private IEnumerator Processing()
     {
         processing = true;
-        Debug.Log("Processing...");
         while (match.IsAny() || match.SwapsAvailable() == false)
         {
             match.ExecuteAndClear((item) =>

@@ -16,52 +16,61 @@ public class LevelLoader : MonoBehaviour
     public GameObject endLevelPopup;
     public GameMode mode = GameMode.Time;
     public float trnsactionTime = 1f;
+    public int levelMoves = 0;
+    public int levelTime = 0;
     public static LevelLoader Instance;
 
     void Awake()
     {
+        Debug.Log("Scene " + endLevelPopup.GetHashCode().ToString());
         if (Instance == null)
         {
             DontDestroyOnLoad(gameObject);
             Instance = this;
+            animator = GetComponent<Animator>();
         }
         else if (Instance != this)
         {
+            Instance.endLevelPopup = endLevelPopup;
+            Instance.animator.Rebind();
+            Instance.animator.ResetTrigger("Out");
+            //Instance.animator.SetTrigger("Reset");
             Destroy(gameObject);
         }
     }
 
     void Start()
     {
-        animator = GetComponent<Animator>();
+        
     }
 
-    public void StartGameWithMoves()
+    public static void StartGameWithMoves()
     {
-        mode = GameMode.Moves;
-        StartCoroutine(MakeTransactionToQuickGame());
+        Instance.mode = GameMode.Moves;
+        Instance.StartCoroutine(Instance.MakeTransactionToQuickGame());
     }
 
-    public void StartGameWithTime()
+    public static void StartGameWithTime()
     {
-        mode = GameMode.Time;
-        StartCoroutine(MakeTransactionToQuickGame());
+        Instance.mode = GameMode.Time;
+        Instance.StartCoroutine(Instance.MakeTransactionToQuickGame());
     }
 
-    public void RepeatLevel()
+    public static void RepeatLevel()
     {
-        StartCoroutine(MakeTransactionToQuickGame());
+        Debug.Log("Repeat");
+        Instance.StartCoroutine(Instance.MakeTransactionToQuickGame());
     }
 
-    public void GoToMainMenu()
+    public static void GoToMainMenu()
     {
-        StartCoroutine(MakeTransactionToMenu());
+        Instance.StartCoroutine(Instance.MakeTransactionToMenu());
     }
 
-    public void EndLevel()
+    public static void EndLevel()
     {
-        endLevelPopup.SetActive(true);
-        endLevelPopup.GetComponent<Animator>().SetTrigger("LevelEnd");
+         Instance.endLevelPopup.SetActive(true);
+         Instance.endLevelPopup.GetComponent<Animator>().SetTrigger("LevelEnd");
     }
 
     IEnumerator MakeTransactionToQuickGame()

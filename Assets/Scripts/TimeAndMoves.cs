@@ -10,7 +10,6 @@ public class TimeAndMoves : MonoBehaviour
     private int value = 0;
     private float accumulator = 0;
     private bool running = false;
-    private LevelLoader loader;
 
     public Text label;
 
@@ -18,7 +17,6 @@ public class TimeAndMoves : MonoBehaviour
     void Awake()
     {
         stringValue = GetComponent<Text>();
-        loader = FindObjectOfType<LevelLoader>();
     }
 
     // Update is called once per frame
@@ -27,7 +25,7 @@ public class TimeAndMoves : MonoBehaviour
         if (running && value <= 0)
         {
             running = false;
-            loader.EndLevel();
+            LevelLoader.EndLevel();
         }
     }
 

@@ -211,17 +211,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &63095147 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
-  m_PrefabInstance: {fileID: 1430429541}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98d19976d7b7ad34f99f55f5cc43e279, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &69301800
 GameObject:
   m_ObjectHideFlags: 0
@@ -403,6 +392,7 @@ GameObject:
   - component: {fileID: 232256119}
   - component: {fileID: 232256118}
   - component: {fileID: 232256120}
+  - component: {fileID: 232256121}
   m_Layer: 5
   m_Name: endLevel
   m_TagString: Untagged
@@ -487,6 +477,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!225 &232256121
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232256116}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &251263726
 GameObject:
   m_ObjectHideFlags: 0
@@ -1672,7 +1674,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 63095147}
+      - m_Target: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
         m_TargetAssemblyTypeName: LevelLoader, Assembly-CSharp
         m_MethodName: RepeatLevel
         m_Mode: 1
@@ -2321,7 +2323,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 63095147}
+      - m_Target: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
         m_TargetAssemblyTypeName: LevelLoader, Assembly-CSharp
         m_MethodName: GoToMainMenu
         m_Mode: 1
@@ -3255,7 +3257,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 400, y: -922.2222}
+  m_AnchoredPosition: {x: 400, y: -811.11115}
   m_SizeDelta: {x: 700.00006, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2033276214

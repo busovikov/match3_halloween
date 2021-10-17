@@ -14,6 +14,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private bool processing = false;
     private bool actionAllowed = true;
     private Score score;
+    private TimeAndMoves timeAndMoves;
 
     // Start is called before the first frame update
     void Awake()
@@ -22,6 +23,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         match = new Match(tileMap);
 
         score = FindObjectOfType<Score>();
+        timeAndMoves = FindObjectOfType<TimeAndMoves>();
 
         collider = GetComponent<BoxCollider2D>();
         collider.size = new Vector2(tileMap.width, tileMap.height);
@@ -32,6 +34,15 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
     private void Start()
     {
+        var loader = FindObjectOfType<LevelLoader>();
+        if (loader.mode == LevelLoader.GameMode.Moves)
+        {
+            timeAndMoves.StartAsMoves(15);
+        }
+        else
+        {
+            timeAndMoves.StartAsSeconds(60);
+        }
         StartCoroutine(ProcessingOnStart());
     }
 
@@ -45,7 +56,10 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         one.ExchangeWith(two, () => 
         {
             if (match.IsAny())
+            {
                 StartCoroutine(Processing());
+                timeAndMoves.Sub(1);
+            }
             else
                 one.ExchangeWith(two, null);
         });

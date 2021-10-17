@@ -5,18 +5,63 @@ using UnityEngine.SceneManagement;
 
 public class LevelLoader : MonoBehaviour
 {
+    public enum GameMode
+    {
+        Time,
+        Moves
+    }
+
     private Animator animator;
+
+    public GameObject endLevelPopup;
+    public GameMode mode = GameMode.Time;
     public float trnsactionTime = 1f;
-    // Start is called before the first frame update
+    public static LevelLoader Instance;
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            DontDestroyOnLoad(gameObject);
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Start()
     {
         animator = GetComponent<Animator>();
     }
 
-    public void StartQuickGame()
+    public void StartGameWithMoves()
     {
-         StartCoroutine(MakeTransactionToQuickGame());
-        
+        mode = GameMode.Moves;
+        StartCoroutine(MakeTransactionToQuickGame());
+    }
+
+    public void StartGameWithTime()
+    {
+        mode = GameMode.Time;
+        StartCoroutine(MakeTransactionToQuickGame());
+    }
+
+    public void RepeatLevel()
+    {
+        StartCoroutine(MakeTransactionToQuickGame());
+    }
+
+    public void GoToMainMenu()
+    {
+        StartCoroutine(MakeTransactionToMenu());
+    }
+
+    public void EndLevel()
+    {
+        endLevelPopup.SetActive(true);
+        endLevelPopup.GetComponent<Animator>().SetTrigger("LevelEnd");
     }
 
     IEnumerator MakeTransactionToQuickGame()
@@ -26,6 +71,15 @@ public class LevelLoader : MonoBehaviour
         yield return new WaitForSeconds(trnsactionTime);
 
         SceneManager.LoadScene("Quick Game");
+    }
+
+    IEnumerator MakeTransactionToMenu()
+    {
+        animator.SetTrigger("Out");
+
+        yield return new WaitForSeconds(trnsactionTime);
+
+        SceneManager.LoadScene("Main Menu");
     }
 
     // Update is called once per frame

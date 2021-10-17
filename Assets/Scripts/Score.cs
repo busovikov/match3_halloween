@@ -8,11 +8,10 @@ public class Score : MonoBehaviour
     public float duration = .3f;
     private float score = 0;
     float remaining = 0;
-    private Text element;
+    public Text[] elements;
 
     void Awake()
     {
-        element = GetComponent<Text>();
     }
 
     public void AddScore(int val)
@@ -37,7 +36,10 @@ public class Score : MonoBehaviour
                 remaining -= part;
             }
 
-            element.text = score.ToString("0");
+            foreach (var element in elements)
+            {
+                element.text = score.ToString("0");
+            }
         }
     }
 }

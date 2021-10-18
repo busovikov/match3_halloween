@@ -119,8 +119,10 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private IEnumerator Processing()
     {
         processing = true;
+        int comboCount = 0;
         while (match.IsAny() || match.SwapsAvailable() == false)
         {
+            comboCount++;
             match.ExecuteAndClear((item) =>
             {
                 item.DestroyContent();
@@ -144,6 +146,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             }
         }
 
+        score.AddCombo(--comboCount);
         processing = false;
     }
     private IEnumerator Reshufle()

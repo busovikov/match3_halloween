@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,8 +8,12 @@ public class Score : MonoBehaviour
 {
     public float duration = .3f;
     private float score = 0;
+    private int comboCount = 0;
+    private int bestCombo = 0;
     float remaining = 0;
     public Text[] elements;
+    public Text comboLabel;
+    public Text bestComboLabel;
 
     void Awake()
     {
@@ -40,6 +45,18 @@ public class Score : MonoBehaviour
             {
                 element.text = score.ToString("0");
             }
+        }
+    }
+
+    internal void AddCombo(int count)
+    {
+        if (count > 1)
+        {
+            comboCount++;
+            if (count > bestCombo)
+                bestCombo = count;
+            comboLabel.text = comboCount.ToString();
+            bestComboLabel.text = bestCombo.ToString();
         }
     }
 }

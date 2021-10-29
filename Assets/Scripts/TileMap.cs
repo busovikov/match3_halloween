@@ -5,14 +5,11 @@ using UnityEngine;
 
 public class TileMap : MonoBehaviour
 {
-    [SerializeField]
     public int width;
-    [SerializeField]
     public int height;
-    [SerializeField]
-    private GameObject prefab;
-    [SerializeField]
+    public GameObject prefab;
     public GameObject[] TilePool;
+    public GameObject[] DeadTilePool;
 
     private GameObject[,] tiles;
 
@@ -84,5 +81,13 @@ public class TileMap : MonoBehaviour
     public bool IsValid(int x, int y)
     {
         return y >= 0 && y < height && x >= 0 && x < width;
+    }
+
+    internal void SpawnDead(int tileType, Transform transform)
+    {
+        var dead = Instantiate(DeadTilePool[tileType], transform.position, Quaternion.identity, transform);
+        var x = UnityEngine.Random.Range(-1f, 1f);
+        var y = UnityEngine.Random.Range(0.1f, 1f);
+        dead.GetComponent<Rigidbody2D>().AddForce(new Vector2(x, y) * 5, ForceMode2D.Impulse);
     }
 }

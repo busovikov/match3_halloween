@@ -22,7 +22,7 @@ public class LevelLoader : MonoBehaviour
 
     void Awake()
     {
-        Debug.Log("Scene " + endLevelPopup.GetHashCode().ToString());
+        
         if (Instance == null)
         {
             DontDestroyOnLoad(gameObject);

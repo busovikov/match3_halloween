@@ -6,11 +6,12 @@ using UnityEngine.UI;
 
 public class Score : MonoBehaviour
 {
-    public float duration = .3f;
+    public float duration = 1f;
     private float score = 0;
     private int comboCount = 0;
     private int bestCombo = 0;
     float remaining = 0;
+    float elapsed = 0;
     public Text[] elements;
     public Text comboLabel;
     public Text bestComboLabel;
@@ -29,11 +30,13 @@ public class Score : MonoBehaviour
     {
         if (remaining > 0)
         {
-            float part = Time.deltaTime * 5;
+            elapsed += Time.deltaTime;
+            float part = Mathf.Lerp(0 , remaining, elapsed / duration);
             if (remaining <= part)
             {
                 score += remaining;
                 remaining = 0;
+                elapsed = 0;
             }
             else
             {

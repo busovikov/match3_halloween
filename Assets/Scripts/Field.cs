@@ -6,6 +6,8 @@ using System;
 using System.Linq;
 public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
+    public GameObject selection; 
+
     private static Vector2 invalidPosition = Vector2.left;
     private new BoxCollider2D collider;
     private Vector2 firstPosition = invalidPosition;
@@ -16,9 +18,12 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private Score score;
     private TimeAndMoves timeAndMoves;
 
+    private SoundManager soundManager;
+
     // Start is called before the first frame update
     void Awake()
     {
+        soundManager = FindObjectOfType<SoundManager>();
         tileMap = GetComponent<TileMap>();
         match = new Match(tileMap);
 
@@ -72,11 +77,13 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             {
                 actionAllowed = false;
                 Swap(firstPosition, offsetPosition);
+                HideSelection();
                 firstPosition = invalidPosition;
             }
             else
             {
                 firstPosition = offsetPosition;
+                ShowSelection(firstPosition);
             }
         }
     }
@@ -125,9 +132,14 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             comboCount++;
             match.ExecuteAndClear((item) =>
             {
+                tileMap.SpawnDead(item.tileType, item.transform);
                 item.DestroyContent();
                 score.AddScore(1);
             });
+
+            soundManager.PlayPop();
+
+            yield return new WaitForSeconds(0.3f);
 
             List<Coroutine> dropAll = new List<Coroutine>();
             for (int x = 0; x < tileMap.width; x++)
@@ -228,5 +240,16 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         }
 
         yield return new WaitForSeconds(.2f); 
+    }
+
+    public void ShowSelection(Vector2 position)
+    {
+        selection.SetActive(true);
+        selection.transform.position = position;
+    }
+
+    public void HideSelection()
+    {
+        selection.SetActive(false);
     }
 }

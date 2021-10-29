@@ -32,11 +32,13 @@ public class TimeAndMoves : MonoBehaviour
     public void Add(int val)
     {
         value += val;
+        stringValue.text = value.ToString();
     }
 
     public void Sub(int val)
     {
         value -= val;
+        stringValue.text = value.ToString();
     }
 
     public void StartAsMoves(int moves)

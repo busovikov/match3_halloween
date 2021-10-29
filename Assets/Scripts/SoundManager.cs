@@ -30,6 +30,13 @@ public class SoundManager : MonoBehaviour
     private const float sliderDuration = 3f;
     private float sliderTimer = 0;
 
+    private void Awake()
+    {
+        popSoundSource = gameObject.AddComponent<AudioSource>();
+        popupDropSoundSource = gameObject.AddComponent<AudioSource>();
+        ThemeSource = gameObject.AddComponent<AudioSource>();
+    }
+
     void InitSoundSources()
     {
         if (PlayerPrefs.HasKey("volume"))
@@ -46,17 +53,15 @@ public class SoundManager : MonoBehaviour
             musicButton.GetComponent<CheckButton>().SetOn(!mute);
         if(volumeButton != null)
             volumeButton.GetComponent<CheckButton>().SetOn(volume > 0);
-        popSoundSource = gameObject.AddComponent<AudioSource>();
+
         popSoundSource.clip = popSound;
         popSoundSource.volume = volume;
         popSoundSource.pitch = pitch;
 
-        popupDropSoundSource = gameObject.AddComponent<AudioSource>();
         popupDropSoundSource.clip = popupDropSound;
         popupDropSoundSource.volume = volume;
         popupDropSoundSource.pitch = pitch;
 
-        ThemeSource = gameObject.AddComponent<AudioSource>();
         ThemeSource.volume = volumeMusic;
         ThemeSource.pitch = pitch;
         ThemeSource.loop = true;
@@ -118,7 +123,7 @@ public class SoundManager : MonoBehaviour
 
     public void PlayPopupSound()
     {
-        popSoundSource.Play();
+        popupDropSoundSource.Play();
     }
 
     public void PlayMainTheme()

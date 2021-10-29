@@ -19,15 +19,17 @@ public class LevelLoader : MonoBehaviour
     public int levelMoves = 0;
     public int levelTime = 0;
     public static LevelLoader Instance;
+    private SoundManager soundManager;
 
+    // Start is called before the first frame update
     void Awake()
     {
-        
         if (Instance == null)
         {
             DontDestroyOnLoad(gameObject);
             Instance = this;
             animator = GetComponent<Animator>();
+            soundManager = FindObjectOfType<SoundManager>();
         }
         else if (Instance != this)
         {
@@ -69,8 +71,9 @@ public class LevelLoader : MonoBehaviour
 
     public static void EndLevel()
     {
-         Instance.endLevelPopup.SetActive(true);
-         Instance.endLevelPopup.GetComponent<Animator>().SetTrigger("LevelEnd");
+        Instance.endLevelPopup.SetActive(true);
+        Instance.endLevelPopup.GetComponent<Animator>().SetTrigger("LevelEnd");
+        Instance.soundManager.PlayPopupSound();
     }
 
     IEnumerator MakeTransactionToQuickGame()

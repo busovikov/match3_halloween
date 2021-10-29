@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6354318591284775609
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6354318591284775610}
+  - component: {fileID: 6354318591284775608}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6354318591284775610
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6354318591284775609}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.1516721, y: 6.661865, z: -54.6837}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6354318591284775608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6354318591284775609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7d5792011ff58d4a883666a0addea2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  volumeSlider: {fileID: 0}
+  musicButton: {fileID: 0}
+  volumeButton: {fileID: 0}
+  popSound: {fileID: 8300000, guid: 2604ae2a64df6be48a933c2e9dd2e4fa, type: 3}
+  popupDropSound: {fileID: 8300000, guid: c22270e8850568543a481a54cd4570ae, type: 3}
+  Themes:
+  - {fileID: 8300000, guid: 78173922e81dbed4eb0a6fd8e0eef656, type: 3}
+  - {fileID: 8300000, guid: 46cbf72448af73144b53c9f9fce54854, type: 3}
+  - {fileID: 8300000, guid: cdb59bd81e2d7f5468f9d9a07fe3a97b, type: 3}
+  - {fileID: 8300000, guid: feb9e10fb101bb04aa911bbd02a1d26f, type: 3}
+  - {fileID: 8300000, guid: 4a5ca6e579f2fad44ba571ccace62eca, type: 3}
+  - {fileID: 8300000, guid: e91c0112f41efc8488fc7c0d5850159e, type: 3}
+  - {fileID: 8300000, guid: f9573534cab011b4faa4f41d4774daaf, type: 3}
+  - {fileID: 8300000, guid: 8cfeb07af56042a4ab7d56436bab31db, type: 3}
+  - {fileID: 8300000, guid: 3435e52b633f668448b7af7d5ae99530, type: 3}
+  - {fileID: 8300000, guid: 50ba056051e2d224e8f15f9654139d4f, type: 3}
+  - {fileID: 8300000, guid: 7ccd99c86b41fd94a972fafbcea4086b, type: 3}
+  volumeMusic: 0.5
+  volume: 0.4
+  pitch: 1

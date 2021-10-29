@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 962e0a57d0a49664a8747da2db5dc7fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selection: {fileID: 7596309805812281159, guid: 8e76ad3f4dac3e346abc9b88f4a9677c, type: 3}
 --- !u!114 &5904029405156730331
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66,6 +67,12 @@ MonoBehaviour:
   - {fileID: 8142070677606287751, guid: af36346a375ddba42aa3c2adbcc250e3, type: 3}
   - {fileID: 2347863074050918069, guid: 10468f264e6a46048b2b91f1d96b71c0, type: 3}
   - {fileID: 7095409677720501727, guid: 4459b02ecfe2c9f4cabf4743428cb59e, type: 3}
+  DeadTilePool:
+  - {fileID: 797616172108591172, guid: 8b990439546b3354eb2c43834030c8bd, type: 3}
+  - {fileID: 7279234765017676879, guid: 301e792822e54af44abca37543193e9a, type: 3}
+  - {fileID: 6021989490703758139, guid: 775dc2e9d7a191342b0b711b322a22b5, type: 3}
+  - {fileID: 8942069327459920238, guid: f500c922c8217804ba5dc99ab7fc0e89, type: 3}
+  - {fileID: 6807006293021911600, guid: e8391ad39abc40b4297770fffe4b81a9, type: 3}
 --- !u!61 &5904029405156730330
 BoxCollider2D:
   m_ObjectHideFlags: 0

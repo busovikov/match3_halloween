@@ -217,8 +217,8 @@ MonoBehaviour:
   endLevelPopup: {fileID: 0}
   mode: 0
   trnsactionTime: 1
-  levelMoves: 15
-  levelTime: 3
+  levelMoves: 20
+  levelTime: 60
 --- !u!1 &5910738033057117807
 GameObject:
   m_ObjectHideFlags: 0

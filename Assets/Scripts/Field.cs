@@ -14,6 +14,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private bool processing = false;
     private bool actionAllowed = true;
     private bool reshuffleRequest = false;
+    private bool rowDestoy = false;
 
     private TileMap tileMap;
     private Match match;
@@ -62,6 +63,14 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                 StartCoroutine(Processing());
             }
         }
+        else if (booster == Boosters.BoosterType.Row)
+        {
+            rowDestoy = true;
+        }
+        else if (booster == Boosters.BoosterType.Plus)
+        {
+
+        }
     }
 
     private void Swap(Vector2 first, Vector2 second)
@@ -87,11 +96,18 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         Vector2 offsetPosition = ToField(position - (Vector2)collider.transform.position);
         if (!processing && actionAllowed && firstPosition != offsetPosition)
         {
-            if (firstPosition != invalidPosition && IsNeighbours(firstPosition, offsetPosition))
+            if (rowDestoy)
             {
                 actionAllowed = false;
-                Swap(firstPosition, offsetPosition);
                 HideSelection();
+                DestroyRow(offsetPosition);
+                rowDestoy = false;
+            }
+            else if (firstPosition != invalidPosition && IsNeighbours(firstPosition, offsetPosition))
+            {
+                actionAllowed = false;
+                HideSelection();
+                Swap(firstPosition, offsetPosition);
                 firstPosition = invalidPosition;
             }
             else
@@ -101,6 +117,16 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             }
         }
     }
+
+    private void DestroyRow(Vector2 position)
+    {
+        if (!tileMap.IsValid(position))
+            return;
+
+        match.SetRowForDestruction((int)position.y);
+        StartCoroutine(Processing());
+    }
+
     private Vector2 ToField(Vector2 position)
     {
         return new Vector2((float)Math.Round(position.x), (float)Math.Round(position.y));

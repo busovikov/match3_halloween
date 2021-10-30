@@ -29,6 +29,14 @@ public class Match
         toBeDestroyed.Clear();
         return destroyed;
     }
+
+    public void SetRowForDestruction(int row)
+    {
+        for (int x = 0; x < tiles.width; x++)
+        {
+            toBeDestroyed.Add(new Vector2(x, row));
+        }
+    }
     public bool SwapsAvailable()
     {
         for (int x = 0; x < tiles.width; x++)

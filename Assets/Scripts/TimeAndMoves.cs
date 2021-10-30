@@ -35,7 +35,7 @@ public class TimeAndMoves : MonoBehaviour
         value += val;
         stringValue.text = value.ToString();
         var newbonus = Instantiate(bonus, bonus.transform.parent);
-        newbonus.GetComponent <Text>().text = "+" + val.ToString();
+        newbonus.GetComponent <Text>().text = label.text + " +" + val.ToString();
         newbonus.GetComponent<Animator>().SetTrigger("Bonus");
         Destroy(newbonus, 1.1f);
     }

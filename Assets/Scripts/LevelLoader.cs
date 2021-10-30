@@ -24,16 +24,17 @@ public class LevelLoader : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
+        soundManager = FindObjectOfType<SoundManager>();
         if (Instance == null)
         {
             DontDestroyOnLoad(gameObject);
             Instance = this;
             animator = GetComponent<Animator>();
-            soundManager = FindObjectOfType<SoundManager>();
         }
         else if (Instance != this)
         {
             Instance.endLevelPopup = endLevelPopup;
+            Instance.soundManager = soundManager;
             Instance.animator.Rebind();
             Instance.animator.ResetTrigger("Out");
             //Instance.animator.SetTrigger("Reset");

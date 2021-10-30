@@ -89,5 +89,6 @@ public class TileMap : MonoBehaviour
         var x = UnityEngine.Random.Range(-1f, 1f);
         var y = UnityEngine.Random.Range(0.1f, 1f);
         dead.GetComponent<Rigidbody2D>().AddForce(new Vector2(x, y) * 5, ForceMode2D.Impulse);
+        Destroy(dead, 1.1f);
     }
 }

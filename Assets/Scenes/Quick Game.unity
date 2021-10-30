@@ -2977,15 +2977,18 @@ MonoBehaviour:
   - btn: {fileID: 0}
     label: {fileID: 0}
     type: 0
-    amount: 2
+    amount: 10
+    cooldown: 10
   - btn: {fileID: 0}
     label: {fileID: 0}
     type: 0
     amount: 1
+    cooldown: 10
   - btn: {fileID: 0}
     label: {fileID: 0}
     type: 0
     amount: 1
+    cooldown: 10
 --- !u!1 &1411844843
 GameObject:
   m_ObjectHideFlags: 0
@@ -3786,7 +3789,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7596309805812281157, guid: 8e76ad3f4dac3e346abc9b88f4a9677c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.722814
+      value: -3.02
       objectReference: {fileID: 0}
     - target: {fileID: 7596309805812281157, guid: 8e76ad3f4dac3e346abc9b88f4a9677c, type: 3}
       propertyPath: m_LocalPosition.z

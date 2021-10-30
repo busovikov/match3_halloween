@@ -6,18 +6,19 @@ using System;
 using System.Linq;
 public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
-    public GameObject selection; 
+    public GameObject selection;
 
-    private static Vector2 invalidPosition = Vector2.left;
     private new BoxCollider2D collider;
+    private static Vector2 invalidPosition = Vector2.left;
     private Vector2 firstPosition = invalidPosition;
-    private TileMap tileMap;
-    private Match match;
     private bool processing = false;
     private bool actionAllowed = true;
+    private bool reshuffleRequest = false;
+
+    private TileMap tileMap;
+    private Match match;
     private Score score;
     private TimeAndMoves timeAndMoves;
-
     private SoundManager soundManager;
 
     // Start is called before the first frame update
@@ -50,10 +51,17 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         StartCoroutine(ProcessingOnStart());
     }
 
-    public delegate void ActivateBoosterCallback(Boosters.BoosterType booster);
     public void ActivateBooster(Boosters.BoosterType booster)
     {
         Debug.Log("Booster activated " + booster.ToString());
+        if (booster == Boosters.BoosterType.Mix)
+        {
+            reshuffleRequest = true;
+            if (!processing)
+            {
+                StartCoroutine(Processing());
+            }
+        }
     }
 
     private void Swap(Vector2 first, Vector2 second)
@@ -132,18 +140,22 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private IEnumerator Processing()
     {
         processing = true;
+
         int comboCount = 0;
-        while (match.IsAny() || match.SwapsAvailable() == false)
+        while (match.IsAny() || match.SwapsAvailable() == false || reshuffleRequest)
         {
             comboCount++;
-            match.ExecuteAndClear((item) =>
+            bool destroyed = match.ExecuteAndClear((item) =>
             {
                 tileMap.SpawnDead(item.tileType, item.transform);
                 item.DestroyContent();
                 score.AddScore(1);
             });
 
-            soundManager.PlayPop();
+            if (destroyed)
+            {
+                soundManager.PlayPop();
+            }
 
             yield return new WaitForSeconds(0.3f);
 
@@ -158,8 +170,9 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                 yield return dropTask;
             }
 
-            while (match.IsAny() == false && match.SwapsAvailable() == false)
+            while (match.IsAny() == false && match.SwapsAvailable() == false || reshuffleRequest )
             {
+                reshuffleRequest = false;
                 yield return Reshuffle();
             }
         }

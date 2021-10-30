@@ -24,9 +24,11 @@ public class Boosters : MonoBehaviour
         public Text label;
         public BoosterType type;
         public int amount;
+        public float cooldown = 10;
 
         public delegate void ActivateBoosterCallback(BoosterType booster);
 
+        private float timer = 0;
         private ActivateBoosterCallback activate;
 
         public void Fill(Transform child, ActivateBoosterCallback cb)
@@ -34,8 +36,12 @@ public class Boosters : MonoBehaviour
             btn = child.GetComponent<Button>();
             activate = cb;
             btn.onClick.AddListener(delegate (){
-                Dec();
-                activate(type);
+                if (amount > 0)
+                {
+                    timer = cooldown;
+                    Dec();
+                    activate(type);
+                }
             });
             label = btn.transform.GetChild(0).GetComponent<Text>();
 
@@ -48,6 +54,15 @@ public class Boosters : MonoBehaviour
             if (label != null)
             {
                 label.text = amount.ToString();
+                if (timer <= 0)
+                {
+                    btn.interactable = amount > 0;
+                }
+                else
+                {
+                    btn.interactable = false;
+                    timer -= Time.deltaTime;
+                }
             }
         }
 

@@ -18,14 +18,16 @@ public class Match
     {
         return toBeDestroyed.Count > 0;
     }
-    public void ExecuteAndClear(Action<Tile> callback)
+    public bool ExecuteAndClear(Action<Tile> callback)
     {
         if(callback != null)
             foreach (var item in toBeDestroyed)
             {
                 callback(tiles.GetTile(item));
             }
+        bool destroyed = toBeDestroyed.Count > 0;
         toBeDestroyed.Clear();
+        return destroyed;
     }
     public bool SwapsAvailable()
     {

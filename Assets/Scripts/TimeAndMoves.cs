@@ -9,8 +9,9 @@ public class TimeAndMoves : MonoBehaviour
     private Text stringValue;
     private int value = 0;
     private float accumulator = 0;
-    private bool running = false;
-
+    
+    [HideInInspector]
+    public bool running = false;
     public Text label;
     public GameObject bonus;
 
@@ -26,7 +27,6 @@ public class TimeAndMoves : MonoBehaviour
         if (running && value <= 0)
         {
             running = false;
-            LevelLoader.EndLevel();
         }
     }
 

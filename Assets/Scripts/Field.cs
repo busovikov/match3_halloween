@@ -52,6 +52,16 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         StartCoroutine(ProcessingOnStart());
     }
 
+    private void Update()
+    {
+        if (!timeAndMoves.running && !processing)
+        {
+            processing = true;
+            score.SetTotalScore();
+            LevelLoader.EndLevel();
+        }
+    }
+
     public void ActivateBooster(Boosters.BoosterType booster)
     {
         Debug.Log("Booster activated " + booster.ToString());
@@ -85,7 +95,10 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             if (match.IsAny())
             {
                 StartCoroutine(Processing());
-                timeAndMoves.Sub(1);
+                if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
+                {
+                    timeAndMoves.Sub(1);
+                }
             }
             else
                 one.ExchangeWith(two, null);
@@ -166,19 +179,26 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         processing = true;
 
         int comboCount = 0;
+        int totalScore = 0;
         while (match.IsAny() || match.SwapsAvailable() == false || reshuffleRequest)
         {
             comboCount++;
-            bool destroyed = match.ExecuteAndClear((item) =>
+            int destroyed = match.ExecuteAndClear((item) =>
             {
                 tileMap.SpawnDead(item.tileType, item.transform);
                 item.DestroyContent();
-                score.AddScore(1);
             });
 
-            if (destroyed)
+            if (destroyed > 0)
             {
+                int currentScore = Enumerable.Range(0, destroyed - 3).Select((index) => index).Sum() + destroyed;
+                score.AddScore(currentScore);
+                score.AddDestroyed(destroyed);
+                totalScore += currentScore;
                 soundManager.PlayPop();
+                int bonus = destroyed - 3;
+                if (bonus > 0)
+                timeAndMoves.Add(bonus);
             }
 
             yield return new WaitForSeconds(0.3f);
@@ -201,7 +221,8 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             }
         }
 
-        score.AddCombo(--comboCount);
+        score.AddCombo(comboCount);
+        score.AddScore(totalScore * comboCount - totalScore);
         processing = false;
     }
     private IEnumerator Reshuffle()

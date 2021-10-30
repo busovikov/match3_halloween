@@ -50,6 +50,12 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         StartCoroutine(ProcessingOnStart());
     }
 
+    public delegate void ActivateBoosterCallback(Boosters.BoosterType booster);
+    public void ActivateBooster(Boosters.BoosterType booster)
+    {
+        Debug.Log("Booster activated " + booster.ToString());
+    }
+
     private void Swap(Vector2 first, Vector2 second)
     {
         if (!tileMap.IsValid(first) || !tileMap.IsValid(second))
@@ -119,7 +125,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         while (match.IsAny() || match.SwapsAvailable() == false)
         {
             match.ExecuteAndClear(null);
-            yield return Reshufle();
+            yield return Reshuffle();
         }
         processing = false;
     }
@@ -154,14 +160,14 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
             while (match.IsAny() == false && match.SwapsAvailable() == false)
             {
-                yield return Reshufle();
+                yield return Reshuffle();
             }
         }
 
         score.AddCombo(--comboCount);
         processing = false;
     }
-    private IEnumerator Reshufle()
+    private IEnumerator Reshuffle()
     {
         int processing = 0;
         var until = new WaitUntil(() => processing == 0);

@@ -12,6 +12,7 @@ public class TimeAndMoves : MonoBehaviour
     private bool running = false;
 
     public Text label;
+    public GameObject bonus;
 
     // Start is called before the first frame update
     void Awake()
@@ -33,6 +34,10 @@ public class TimeAndMoves : MonoBehaviour
     {
         value += val;
         stringValue.text = value.ToString();
+        var newbonus = Instantiate(bonus, bonus.transform.parent);
+        newbonus.GetComponent <Text>().text = "+" + val.ToString();
+        newbonus.GetComponent<Animator>().SetTrigger("Bonus");
+        Destroy(newbonus, 1.1f);
     }
 
     public void Sub(int val)

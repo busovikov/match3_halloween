@@ -69,7 +69,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         }
         else if (booster == Boosters.BoosterType.Plus)
         {
-
+            timeAndMoves.Add(5);
         }
     }
 
@@ -141,7 +141,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     public void OnPointerDown(PointerEventData eventData)
     {
         SetPosition(eventData.pointerCurrentRaycast.worldPosition);
-        //SetPosition(Camera.main.ScreenToWorldPoint(Input.mousePosition));
     }
     public void OnPointerUp(PointerEventData eventData)
     {
@@ -150,7 +149,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     public void OnDrag(PointerEventData eventData)
     {
         SetPosition(eventData.pointerCurrentRaycast.worldPosition);
-        //SetPosition(Camera.main.ScreenToWorldPoint(Input.mousePosition));
     }
     private IEnumerator ProcessingOnStart()
     {

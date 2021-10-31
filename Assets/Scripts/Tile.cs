@@ -59,14 +59,7 @@ public class Tile : MonoBehaviour
             yield return null;
             elapsed += Time.deltaTime;
             var weight = Math.Min(1, elapsed / 0.2f);
-            try
-            {
-                content.transform.position = Vector3.Lerp(InitialOffset, container.transform.position, weight);
-            }
-            catch
-            {
-                Debug.Log("caught");
-            }
+            content.transform.position = Vector3.Lerp(InitialOffset, container.transform.position, weight);
         } while (!IsSet());
 
         yield return null;

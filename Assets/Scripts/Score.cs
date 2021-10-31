@@ -15,9 +15,6 @@ public class Score : MonoBehaviour
     private int bestCombo = 0;
     private int bestMatch = 0;
 
-    float remaining = 0;
-    float elapsed = 0;
-
     public Text comboBonus;
     public Text[] elements;
     public Text bestScoreLabel;

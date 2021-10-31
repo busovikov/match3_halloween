@@ -875,7 +875,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.854902, g: 0.8313726, b: 0.8000001, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -965,7 +965,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.854902, g: 0.8313726, b: 0.8000001, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -994,17 +994,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 295421098}
   m_CullTransparentMesh: 1
---- !u!114 &357528066 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5904029405156730333, guid: a3ba8e75040d3b448b312e4007a695fc, type: 3}
-  m_PrefabInstance: {fileID: 5904029406271596438}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 962e0a57d0a49664a8747da2db5dc7fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &440527811
 GameObject:
   m_ObjectHideFlags: 0
@@ -1602,7 +1591,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.9254902, g: 0.91764706, b: 0.90588236, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2203,6 +2192,7 @@ GameObject:
   - component: {fileID: 1065722535}
   - component: {fileID: 1065722534}
   - component: {fileID: 1065722533}
+  - component: {fileID: 1065722536}
   m_Layer: 5
   m_Name: Booster Button Row
   m_TagString: Untagged
@@ -2312,6 +2302,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1065722531}
   m_CullTransparentMesh: 1
+--- !u!95 &1065722536
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1065722531}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 75aa955af3443484bb9fd4ff40004b6c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1124931209
 GameObject:
   m_ObjectHideFlags: 0
@@ -3072,22 +3081,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bed205d5476b9ba4b86faeef3f5e5b2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  listener: {fileID: 357528066}
   boosters:
   - btn: {fileID: 0}
     label: {fileID: 0}
+    animation: {fileID: 0}
     type: 0
     amount: 1
-    cooldown: 5
+    cooldown: 10
   - btn: {fileID: 0}
     label: {fileID: 0}
+    animation: {fileID: 0}
     type: 1
     amount: 1
     cooldown: 5
   - btn: {fileID: 0}
     label: {fileID: 0}
+    animation: {fileID: 0}
     type: 2
-    amount: 2
+    amount: 1
     cooldown: 3
 --- !u!1 &1411844843
 GameObject:
@@ -3221,6 +3232,18 @@ PrefabInstance:
     - target: {fileID: 5910738033042482112, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
+      propertyPath: mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
+      propertyPath: levelTime
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
+      propertyPath: levelMoves
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
       propertyPath: endLevelPopup
@@ -3370,7 +3393,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.9245283, g: 0.91518337, b: 0.9027234, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3713,6 +3736,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eea3ac958addb6a4faf86a409257ef73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  value: 0
   running: 0
   label: {fileID: 2067166923}
   bonus: {fileID: 577096580}
@@ -3729,7 +3753,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.9254902, g: 0.91764706, b: 0.90588236, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4299,6 +4323,7 @@ GameObject:
   - component: {fileID: 1620755186}
   - component: {fileID: 1620755185}
   - component: {fileID: 1620755184}
+  - component: {fileID: 1620755187}
   m_Layer: 5
   m_Name: Booster Button Plus
   m_TagString: Untagged
@@ -4408,6 +4433,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1620755182}
   m_CullTransparentMesh: 1
+--- !u!95 &1620755187
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1620755182}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 75aa955af3443484bb9fd4ff40004b6c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1635700189
 GameObject:
   m_ObjectHideFlags: 0
@@ -4458,7 +4502,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.854902, g: 0.8313726, b: 0.8000001, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5304,7 +5348,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.9254902, g: 0.91764706, b: 0.90588236, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5424,6 +5468,7 @@ GameObject:
   - component: {fileID: 2117891479}
   - component: {fileID: 2117891478}
   - component: {fileID: 2117891477}
+  - component: {fileID: 2117891480}
   m_Layer: 5
   m_Name: Booster Button Mix
   m_TagString: Untagged
@@ -5533,6 +5578,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2117891475}
   m_CullTransparentMesh: 1
+--- !u!95 &2117891480
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2117891475}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 75aa955af3443484bb9fd4ff40004b6c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1001 &5904029406271596438
 PrefabInstance:
   m_ObjectHideFlags: 0

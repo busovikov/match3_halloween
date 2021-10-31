@@ -6,7 +6,6 @@ using UnityEngine.UI;
 [SerializeField]
 public class Boosters : MonoBehaviour
 {
-    public Field listener;
     public enum BoosterType
     {
         Mix,
@@ -22,6 +21,8 @@ public class Boosters : MonoBehaviour
         public Button btn;
         [HideInInspector]
         public Text label;
+        [HideInInspector]
+        public Animator animation;
         public BoosterType type;
         public int amount;
         public float cooldown = 10;
@@ -34,6 +35,7 @@ public class Boosters : MonoBehaviour
         public void Fill(Transform child, ActivateBoosterCallback cb)
         {
             btn = child.GetComponent<Button>();
+            animation = child.GetComponent<Animator>();
             activate = cb;
             btn.onClick.AddListener(delegate (){
                 if (amount > 0)
@@ -68,6 +70,7 @@ public class Boosters : MonoBehaviour
             if (amount < max)
             {
                 amount++;
+                animation.SetTrigger("Add");
             }
         }
 
@@ -77,6 +80,19 @@ public class Boosters : MonoBehaviour
             {
                 amount--;
             }
+        }
+
+        private void Mul(int val)
+        {
+            if (amount > 0)
+            {
+                amount = amount * val;
+            }
+            else
+            {
+                amount = 1;
+            }
+            animation.SetTrigger("Add");
         }
         public static Booster operator ++(Booster b)
         {
@@ -90,23 +106,44 @@ public class Boosters : MonoBehaviour
             return b;
         }
 
-        
+        public static Booster operator *(Booster b, int val)
+        {
+            b.Mul(val);
+            return b;
+        }
+
     }
 
     public Booster[] boosters;
+    Dictionary<BoosterType, int> lookupTable = new Dictionary<BoosterType, int>();
 
-    private void Awake()
+    public void InitBoosters(Booster.ActivateBoosterCallback cb)
     {
         int size = Mathf.Max(transform.childCount, boosters.Length);
         for (int i = 0; i < size; i++)
         {
-            boosters[i].Fill(transform.GetChild(i), listener.ActivateBooster);
+            boosters[i].Fill(transform.GetChild(i), cb);
+            lookupTable[boosters[i].type] = i;
         }
     }
-    // Start is called before the first frame update
-    void Start()
+
+    public void AddBonus(int val)
     {
-        
+        if (val < 5)
+        {
+            return;
+        }
+        else if (val < 9)
+        {
+            for (int i = 6; i <= val; i++) // 3 - 8
+            {
+                boosters[Random.Range(0, boosters.Length)]++;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < boosters.Length; i++) { _ = boosters[i] * (val - 8); }
+        }
     }
 
     // Update is called once per frame

@@ -21,10 +21,13 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private Score score;
     private TimeAndMoves timeAndMoves;
     private SoundManager soundManager;
+    private Boosters boosters;
 
     // Start is called before the first frame update
     void Awake()
     {
+        boosters = FindObjectOfType<Boosters>();
+        boosters.InitBoosters(ActivateBooster);
         soundManager = FindObjectOfType<SoundManager>();
         tileMap = GetComponent<TileMap>();
         match = new Match(tileMap);
@@ -77,7 +80,14 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         }
         else if (booster == Boosters.BoosterType.Plus)
         {
-            timeAndMoves.Add(5);
+            if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
+            {
+                timeAndMoves.Add(2);
+            }
+            else
+            {
+                timeAndMoves.Add(5);
+            }
         }
     }
 
@@ -202,10 +212,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                 int bonus = LevelLoader.LevelBonus(destroyed);
                 if (bonus > 0)
                 {
-                    if (bonus > 3)
-                    {
-                        Debug.Log("Hi " + bonus.ToString() + "From " + (destroyed).ToString());
-                    }
                     timeAndMoves.Add(bonus);
                 }
             }
@@ -238,6 +244,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         score.AddCombo(comboCount);
         score.AddScore(totalScore * comboCount - totalScore);
         score.SetTotalScore();
+        boosters.AddBonus(comboCount);
         if (timeAndMoves.value <= 0)
         {
             LevelLoader.EndLevel();

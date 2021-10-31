@@ -7,11 +7,13 @@ using UnityEngine.UI;
 public class TimeAndMoves : MonoBehaviour
 {
     private Text stringValue;
-    private int value = 0;
     private float accumulator = 0;
-    
+
+    [HideInInspector]
+    public int value = 0;
     [HideInInspector]
     public bool running = false;
+
     public Text label;
     public GameObject bonus;
 
@@ -21,13 +23,18 @@ public class TimeAndMoves : MonoBehaviour
         stringValue = GetComponent<Text>();
     }
 
-    // Update is called once per frame
-    void Update()
+     public bool Check()
     {
-        if (running && value <= 0)
+        if (running && value > 0)
         {
-            running = false;
+            accumulator += Time.deltaTime;
+            if (accumulator >= 1)
+            {
+                accumulator -= 1;
+                Sub(1);
+            }
         }
+        return value > 0;
     }
 
     public void Add(int val)
@@ -44,6 +51,10 @@ public class TimeAndMoves : MonoBehaviour
     {
         value -= val;
         stringValue.text = value.ToString();
+        if (running && value <= 0)
+        {
+            running = false;
+        }
     }
 
     public void StartAsMoves(int moves)
@@ -51,7 +62,6 @@ public class TimeAndMoves : MonoBehaviour
         value = moves;
         label.text = "Moves";
         stringValue.text = value.ToString();
-        running = true;
     }
 
     public void StartAsSeconds(int seconds)
@@ -60,22 +70,7 @@ public class TimeAndMoves : MonoBehaviour
         label.text = "Time";
         stringValue.text = value.ToString();
         running = true;
-        StartCoroutine(StartCountDown());
     }
 
-    private IEnumerator StartCountDown()
-    {
-        while (value > 0)
-        {
-            accumulator += Time.deltaTime;
-            if (accumulator >= 1)
-            {
-                accumulator -= 1;
-                value--;
-                stringValue.text = value.ToString();
-            }
-
-            yield return null;
-        }
-    }
+    
 }

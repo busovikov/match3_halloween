@@ -47,6 +47,14 @@ public class LevelLoader : MonoBehaviour
         
     }
 
+    public static int LevelBonus(int bonus)
+    {
+        if (Instance.mode == GameMode.Moves)
+        {
+            return (int)((bonus - 3)/1.5f);
+        }
+        return bonus - 3;
+    }
     public static void StartGameWithMoves()
     {
         Instance.mode = GameMode.Moves;

@@ -65,7 +65,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   endLevelPopup: {fileID: 0}
-  mode: 0
+  mode: 1
   trnsactionTime: 1
   levelMoves: 20
   levelTime: 60

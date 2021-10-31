@@ -3223,10 +3223,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
-      propertyPath: levelTime
-      value: 60
-      objectReference: {fileID: 0}
-    - target: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
       propertyPath: endLevelPopup
       value: 
       objectReference: {fileID: 232256116}

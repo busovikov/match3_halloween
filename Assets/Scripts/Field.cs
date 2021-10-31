@@ -54,10 +54,9 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
     private void Update()
     {
-        if (!timeAndMoves.running && !processing)
+        if (!timeAndMoves.Check() && !processing)
         {
             processing = true;
-            score.SetTotalScore();
             LevelLoader.EndLevel();
         }
     }
@@ -200,9 +199,15 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                 score.AddDestroyed(destroyed);
                 totalScore += currentScore;
                 soundManager.PlayPop();
-                int bonus = destroyed - 3;
+                int bonus = LevelLoader.LevelBonus(destroyed);
                 if (bonus > 0)
-                timeAndMoves.Add(bonus);
+                {
+                    if (bonus > 3)
+                    {
+                        Debug.Log("Hi " + bonus.ToString() + "From " + (destroyed).ToString());
+                    }
+                    timeAndMoves.Add(bonus);
+                }
             }
 
             yield return new WaitForSeconds(0.2f);
@@ -232,6 +237,11 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
         score.AddCombo(comboCount);
         score.AddScore(totalScore * comboCount - totalScore);
+        score.SetTotalScore();
+        if (timeAndMoves.value <= 0)
+        {
+            LevelLoader.EndLevel();
+        }
         processing = false;
     }
     private IEnumerator Reshuffle()

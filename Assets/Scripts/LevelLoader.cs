@@ -13,6 +13,9 @@ public class LevelLoader : MonoBehaviour
 
     private Animator animator;
 
+    public GameObject credits;
+    public GameObject menu;
+    public GameObject ghost;
     public GameObject endLevelPopup;
     public GameMode mode = GameMode.Time;
     public float trnsactionTime = 1f;
@@ -50,6 +53,20 @@ public class LevelLoader : MonoBehaviour
     public static void Exit()
     {
         Application.Quit();
+    }
+
+    public static void ToCredits()
+    {
+        Instance.menu.SetActive(false);
+        Instance.ghost.SetActive(false);
+        Instance.credits.SetActive(true);
+    }
+
+    public static void BackToMainMenu()
+    {
+        Instance.menu.SetActive(true);
+        Instance.ghost.SetActive(true);
+        Instance.credits.SetActive(false);
     }
 
     public static int LevelBonus(int bonus)

@@ -127,10 +127,13 @@ public class Match
         {
             Sink(set);
         }
-        set.Add(new Vector2(x, y));
-        var s = "";
-        foreach (var i in set)
-            s += " " + i.ToString();
+        if (tiles.IsValid(x, y))
+        {
+            set.Add(new Vector2(x, y));
+            var s = "";
+            foreach (var i in set)
+                s += " " + i.ToString();
+        }
     }
 
     private void Sink(List<Vector2> set)

@@ -61,7 +61,6 @@ public class LevelLoader : MonoBehaviour
 
     public static void RepeatLevel()
     {
-        Debug.Log("Repeat");
         Instance.StartCoroutine(Instance.MakeTransactionToQuickGame());
     }
 

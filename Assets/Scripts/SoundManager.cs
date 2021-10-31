@@ -44,7 +44,6 @@ public class SoundManager : MonoBehaviour
             volume = PlayerPrefs.GetFloat("volume");
             volumeMusic = PlayerPrefs.GetFloat("volumeMusic");
             mute = Convert.ToBoolean(PlayerPrefs.GetInt("Mute"));
-            Debug.Log("Load" + PlayerPrefs.GetInt("Mute").ToString());
         }
 
         if(volumeSlider != null)
@@ -83,7 +82,6 @@ public class SoundManager : MonoBehaviour
         }
         PlayerPrefs.SetFloat("volumeMusic", volumeMusic);
         PlayerPrefs.SetInt("Mute", Convert.ToInt32(mute));
-        Debug.Log("Save" + Convert.ToInt32(mute).ToString());
     }
 
     public void OnVolumeChanged()

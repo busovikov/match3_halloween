@@ -31,8 +31,6 @@ public class Score : MonoBehaviour
         {
             bestScore = PlayerPrefs.GetInt("bestScore");
             totalScore = PlayerPrefs.GetInt("totalScore");
-            //bestCombo = PlayerPrefs.GetInt("bestCombo");
-            //bestMatch = PlayerPrefs.GetInt("bestMatch");
         }
     }
 

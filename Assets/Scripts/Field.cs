@@ -64,7 +64,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
     public void ActivateBooster(Boosters.BoosterType booster)
     {
-        Debug.Log("Booster activated " + booster.ToString());
         if (booster == Boosters.BoosterType.Mix)
         {
             reshuffleRequest = true;
@@ -94,20 +93,25 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         {
             if (match.IsAny())
             {
-                StartCoroutine(Processing());
+                if (!processing)
+                {
+                    StartCoroutine(Processing());
+                }
                 if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
                 {
                     timeAndMoves.Sub(1);
                 }
             }
             else
+            {
                 one.ExchangeWith(two, null);
+            }
         });
     }
     private void SetPosition(Vector2 position)
     {
         Vector2 offsetPosition = ToField(position - (Vector2)collider.transform.position);
-        if (!processing && actionAllowed && firstPosition != offsetPosition)
+        if (actionAllowed && firstPosition != offsetPosition)
         {
             if (rowDestoy)
             {
@@ -201,13 +205,18 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                 timeAndMoves.Add(bonus);
             }
 
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSeconds(0.2f);
 
             List<Coroutine> dropAll = new List<Coroutine>();
             for (int x = 0; x < tileMap.width; x++)
             {
                  dropAll.Add(StartCoroutine(DropAndReplaceWithNew(x)));
             }
+
+            yield return null;
+            actionAllowed = true; // Can swap while propping
+
+            yield return new WaitForSeconds(0.2f);
 
             foreach (Coroutine dropTask in dropAll)
             {
@@ -284,7 +293,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             {
                 Tile bottom = tileMap.GetTile(x, y - destroyedCount);
                 animations.Add(tile.DropTo(bottom));
-                yield return null;
             }
         }
 
@@ -294,7 +302,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             var offset = new Vector2(0, destroyedCount);
             bool dropped = true;
             animations.Add(tileMap.Create(position, offset, dropped));
-            yield return null;
         }
 
         // Wait for all animations are done
@@ -302,8 +309,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         {
             yield return animation;
         }
-
-        yield return new WaitForSeconds(.2f); 
     }
 
     public void ShowSelection(Vector2 position)

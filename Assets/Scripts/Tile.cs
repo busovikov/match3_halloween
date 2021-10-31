@@ -46,19 +46,27 @@ public class Tile : MonoBehaviour
     }
     public bool IsSet()
     {
-        return container.transform.position == content.transform.position;
+        return content != null && container.transform.position == content.transform.position;
     }
     public IEnumerator SwapAnimation(Action onMoved = null)
     {
         float elapsed = 0f;
         var InitialOffset = content.transform.position;
         float path = (InitialOffset - container.transform.position).magnitude / 10;
+        
         do
         {
             yield return null;
             elapsed += Time.deltaTime;
             var weight = Math.Min(1, elapsed / 0.2f);
-            content.transform.position = Vector3.Lerp(InitialOffset, container.transform.position, weight);
+            try
+            {
+                content.transform.position = Vector3.Lerp(InitialOffset, container.transform.position, weight);
+            }
+            catch
+            {
+                Debug.Log("caught");
+            }
         } while (!IsSet());
 
         yield return null;

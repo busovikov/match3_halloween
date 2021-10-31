@@ -44,9 +44,6 @@ public class Boosters : MonoBehaviour
                 }
             });
             label = btn.transform.GetChild(0).GetComponent<Text>();
-
-            Debug.Log("Button " + btn.name);
-            Debug.Log("Button " + label.text);
         }
 
         public void Update()

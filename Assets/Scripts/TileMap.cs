@@ -80,7 +80,8 @@ public class TileMap : MonoBehaviour
 
     public bool IsValid(int x, int y)
     {
-        return y >= 0 && y < height && x >= 0 && x < width;
+        bool withInBoundaries = y >= 0 && y < height && x >= 0 && x < width;
+        return withInBoundaries && GetTile(x,y).IsSet();
     }
 
     internal void SpawnDead(int tileType, Transform transform)

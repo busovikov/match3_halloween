@@ -62,6 +62,16 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             processing = true;
             LevelLoader.EndLevel();
         }
+
+        // Make sure user is on Android platform
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            // Check if Back was pressed this frame
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                LevelLoader.Exit();
+            }
+        }
     }
 
     public void ActivateBooster(Boosters.BoosterType booster)

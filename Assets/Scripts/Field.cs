@@ -98,7 +98,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
         one.ExchangeWith(two, () => 
         {
-            if (match.IsAny())
+            if (match.IsAnyMatch(first,second))
             {
                 if (!processing)
                 {
@@ -214,6 +214,8 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                 }
             }
 
+            actionAllowed = true; // Can swap while propping
+
             yield return new WaitForSeconds(0.2f);
 
             List<Coroutine> dropAll = new List<Coroutine>();
@@ -221,11 +223,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             {
                  dropAll.Add(StartCoroutine(DropAndReplaceWithNew(x)));
             }
-
-            yield return null;
-            actionAllowed = true; // Can swap while propping
-
-            yield return new WaitForSeconds(0.2f);
 
             foreach (Coroutine dropTask in dropAll)
             {

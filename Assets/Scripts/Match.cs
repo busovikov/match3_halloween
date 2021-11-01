@@ -100,9 +100,14 @@ public class Match
             setY[i].Capacity = tiles.height;
         }
     }
-    public bool IsAny()
+
+    public bool IsAnyMatch(Vector2 one, Vector2 two)
     {
-        if (ToBeDestroyed())
+        return IsAny(true) && (toBeDestroyed.Contains(one) || toBeDestroyed.Contains(two));
+    }
+    public bool IsAny(bool force = false)
+    {
+        if (!force && ToBeDestroyed())
             return true;
 
         InitSets();

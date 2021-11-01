@@ -38,8 +38,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         collider = GetComponent<BoxCollider2D>();
         collider.size = new Vector2(tileMap.width, tileMap.height);
         collider.offset = collider.size / 2 - Vector2.one / 2;
-        //Camera.main.transform.position += (Vector3)collider.offset;
-        //Camera.main.orthographicSize = Math.Max(tileMap.width, (float)tileMap.height / 2) + 1;
     }
 
     private void Start()
@@ -61,16 +59,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         {
             processing = true;
             LevelLoader.EndLevel();
-        }
-
-        // Make sure user is on Android platform
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            // Check if Back was pressed this frame
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                LevelLoader.Exit();
-            }
         }
     }
 

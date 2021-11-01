@@ -36,6 +36,9 @@ public class LevelLoader : MonoBehaviour
         }
         else if (Instance != this)
         {
+            Instance.credits = credits;
+            Instance.menu = menu;
+            Instance.ghost = ghost;
             Instance.endLevelPopup = endLevelPopup;
             Instance.soundManager = soundManager;
             Instance.animator.Rebind();

@@ -16,6 +16,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private bool reshuffleRequest = false;
     private bool rowDestoy = false;
 
+    private Goals goals;
     private TileMap tileMap;
     private Match match;
     private Score score;
@@ -30,6 +31,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         boosters.InitBoosters(ActivateBooster);
         soundManager = FindObjectOfType<SoundManager>();
         tileMap = GetComponent<TileMap>();
+        goals = tileMap.goal.GetComponent<Goals>();
         match = new Match(tileMap);
 
         score = FindObjectOfType<Score>();
@@ -42,23 +44,24 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
     private void Start()
     {
+        var movesOrTime = goals.GetGoalForGameMode(LevelLoader.Instance.mode);
         if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
         {
-            timeAndMoves.StartAsMoves(LevelLoader.Instance.levelMoves);
+            timeAndMoves.StartAsMoves(movesOrTime);
         }
         else
         {
-            timeAndMoves.StartAsSeconds(LevelLoader.Instance.levelTime);
+            timeAndMoves.StartAsSeconds(movesOrTime);
         }
         StartCoroutine(ProcessingOnStart());
     }
 
     private void Update()
     {
-        if (!timeAndMoves.Check() && !processing)
+        if ((!timeAndMoves.Check() || goals.reached) && !processing)
         {
             processing = true;
-            LevelLoader.EndLevel();
+            LevelLoader.EndLevel(goals.reached);
         }
     }
 
@@ -240,9 +243,9 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         score.AddScore(totalScore * comboCount - totalScore);
         score.SetTotalScore();
         boosters.AddBonus(comboCount);
-        if (timeAndMoves.value <= 0)
+        if (timeAndMoves.value <= 0 || goals.reached)
         {
-            LevelLoader.EndLevel();
+            LevelLoader.EndLevel(goals.reached);
         }
         processing = false;
     }

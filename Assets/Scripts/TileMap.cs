@@ -7,12 +7,13 @@ public class TileMap : MonoBehaviour
 {
     public int width;
     public int height;
+    public GameObject goal;
     public GameObject prefab;
     public GameObject[] TilePool;
     public GameObject[] DeadTilePool;
 
     private GameObject[,] tiles;
-
+    private int goalType;
     void Awake()
     {
         tiles = new GameObject[width, height];
@@ -27,6 +28,11 @@ public class TileMap : MonoBehaviour
                 tiles[i, j] = tile;
                 InitContent(i, j, types);
             }
+    }
+
+    private void Start()
+    {
+        goalType = goal.GetComponent<Goals>().type;
     }
 
     public Coroutine Create(Vector2 position, Vector2 offset, bool dropped = false)
@@ -87,9 +93,21 @@ public class TileMap : MonoBehaviour
     internal void SpawnDead(int tileType, Transform transform)
     {
         var dead = Instantiate(DeadTilePool[tileType], transform.position, Quaternion.identity, transform);
-        var x = UnityEngine.Random.Range(-1f, 1f);
-        var y = UnityEngine.Random.Range(0.1f, 1f);
-        dead.GetComponent<Rigidbody2D>().AddForce(new Vector2(x, y) * 5, ForceMode2D.Impulse);
-        Destroy(dead, 1.1f);
+        if (tileType != goalType)
+        {
+            var x = UnityEngine.Random.Range(-1f, 1f);
+            var y = UnityEngine.Random.Range(0.1f, 1f);
+            dead.GetComponent<Rigidbody2D>().AddForce(new Vector2(x, y) * 5, ForceMode2D.Impulse);
+            dead.GetComponent<Animator>().SetTrigger("Dead");
+            Destroy(dead, 1.1f);
+        }
+        else
+        {
+            
+            var toGoal =  goal.transform.position - transform.position;
+            dead.GetComponent<Animator>().SetTrigger("Dead");
+            dead.GetComponent<Rigidbody2D>().gravityScale = 0;
+            dead.GetComponent<Rigidbody2D>().AddForce (toGoal * 2.5f, ForceMode2D.Impulse );
+        }
     }
 }

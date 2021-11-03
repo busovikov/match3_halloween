@@ -147,7 +147,8 @@ PlayerSettings:
   resolutionScalingMode: 0
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
-  applicationIdentifier: {}
+  applicationIdentifier:
+    Android: com.Busovikov.BubbleBeastsHalloween
   buildNumber:
     Standalone: 0
     iPhone: 0
@@ -293,7 +294,7 @@ PlayerSettings:
       m_Kind: 0
       m_SubKind: 
     - m_Textures:
-      - {fileID: 2800000, guid: e2bcc28e22a001e4ba36114784ae8c6c, type: 3}
+      - {fileID: 2800000, guid: 55b5c6c92aa3f0f4aa23540ada2f486a, type: 3}
       - {fileID: 2800000, guid: 4307220335f3b32458c4fee4528e37fd, type: 3}
       m_Width: 432
       m_Height: 432

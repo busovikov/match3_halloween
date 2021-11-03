@@ -64,10 +64,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98d19976d7b7ad34f99f55f5cc43e279, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  credits: {fileID: 0}
+  menu: {fileID: 0}
+  ghost: {fileID: 0}
   endLevelPopup: {fileID: 0}
-  mode: 1
+  mode: 0
   trnsactionTime: 1
-  levelMoves: 20
+  levelMoves: 15
   levelTime: 60
 --- !u!1 &5910738033650672299
 GameObject:

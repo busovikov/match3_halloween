@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class LevelLoader : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class LevelLoader : MonoBehaviour
     public GameObject menu;
     public GameObject ghost;
     public GameObject endLevelPopup;
+    public Text winLabel;
+    public Text nextLabel;
     public GameMode mode = GameMode.Time;
     public float trnsactionTime = 1f;
     public int levelMoves = 0;
@@ -36,10 +39,13 @@ public class LevelLoader : MonoBehaviour
         }
         else if (Instance != this)
         {
+            // TODO: make endgame manager
             Instance.credits = credits;
             Instance.menu = menu;
             Instance.ghost = ghost;
             Instance.endLevelPopup = endLevelPopup;
+            Instance.winLabel = winLabel;
+            Instance.nextLabel = nextLabel;
             Instance.soundManager = soundManager;
             Instance.animator.Rebind();
             Instance.animator.ResetTrigger("Out");
@@ -102,8 +108,19 @@ public class LevelLoader : MonoBehaviour
         Instance.StartCoroutine(Instance.MakeTransactionToMenu());
     }
 
-    public static void EndLevel()
+    public static void EndLevel(bool win)
     {
+        if (win)
+        {
+            Instance.winLabel.text = "You Win\nNext?";
+            Instance.nextLabel.text = "Next";
+        }
+        else
+        {
+            Instance.winLabel.text = "Not This\nTime!";
+            Instance.nextLabel.text = "Again";
+        }
+
         Instance.endLevelPopup.SetActive(true);
         Instance.endLevelPopup.GetComponent<Animator>().SetTrigger("LevelEnd");
         Instance.soundManager.PlayPopupSound();

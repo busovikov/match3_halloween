@@ -9,8 +9,9 @@ public class Boosters : MonoBehaviour
     public enum BoosterType
     {
         Mix,
-        Row,
-        Plus
+        Erase,
+        Add,
+        Count
     }
 
     [System.Serializable]
@@ -25,12 +26,31 @@ public class Boosters : MonoBehaviour
         public Animator animation;
         public BoosterType type;
         public int amount;
+        public int price;
         public float cooldown = 10;
 
         public delegate void ActivateBoosterCallback(BoosterType booster);
 
         private float timer = 0;
         private ActivateBoosterCallback activate;
+
+        private string Name()
+        {
+            return "Booster." + type.ToString();
+        }
+
+        public void Save()
+        {
+            PlayerPrefs.SetInt(Name(), amount);
+        }
+
+        public void Load()
+        {
+            if (PlayerPrefs.HasKey(Name()))
+            {
+                amount = PlayerPrefs.GetInt(Name());
+            }
+        }
 
         public void Fill(Transform child, ActivateBoosterCallback cb)
         {
@@ -72,6 +92,7 @@ public class Boosters : MonoBehaviour
                 amount++;
                 animation.SetTrigger("Add");
             }
+            Save();
         }
 
         private void Dec()
@@ -80,6 +101,7 @@ public class Boosters : MonoBehaviour
             {
                 amount--;
             }
+            Save();
         }
 
         private void Mul(int val)
@@ -93,6 +115,7 @@ public class Boosters : MonoBehaviour
                 amount = 1;
             }
             animation.SetTrigger("Add");
+            Save();
         }
         public static Booster operator ++(Booster b)
         {
@@ -119,14 +142,47 @@ public class Boosters : MonoBehaviour
 
     public void InitBoosters(Booster.ActivateBoosterCallback cb)
     {
-        int size = Mathf.Max(transform.childCount, boosters.Length);
+        int size = Mathf.Min(transform.childCount, boosters.Length);
         for (int i = 0; i < size; i++)
         {
+            boosters[i].Load();
             boosters[i].Fill(transform.GetChild(i), cb);
             lookupTable[boosters[i].type] = i;
         }
     }
 
+    public void FillPrice(Text[] prices)
+    {
+        int size = Mathf.Min(prices.Length, boosters.Length);
+        for (int i = 0; i < size; i++)
+        {
+            prices[i].text = boosters[i].price.ToString();
+        }
+    }
+
+    public void FillAmount(Text[] counts)
+    {
+        int size = Mathf.Min(counts.Length, boosters.Length);
+        for (int i = 0; i < size; i++)
+        {
+            counts[i].text = boosters[i].amount.ToString();
+        }
+    }
+
+    public int Price(Boosters.BoosterType type)
+    {
+        return boosters[lookupTable[type]].price;
+    }
+
+    public int Index(Boosters.BoosterType type)
+    {
+        return lookupTable[type];
+    }
+
+    public int AddBooster(Boosters.BoosterType type)
+    {
+        return (boosters[Index(type)]++).amount;
+    }
     public void AddBonus(int val)
     {
         if (val < 5)

@@ -19,7 +19,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private Goals goals;
     private TileMap tileMap;
     private Match match;
-    private Score score;
+    private ScoreManager score;
     private TimeAndMoves timeAndMoves;
     private SoundManager soundManager;
     private Boosters boosters;
@@ -34,7 +34,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         goals = tileMap.goal.GetComponent<Goals>();
         match = new Match(tileMap);
 
-        score = FindObjectOfType<Score>();
+        score = FindObjectOfType<ScoreManager>();
         timeAndMoves = FindObjectOfType<TimeAndMoves>();
 
         collider = GetComponent<BoxCollider2D>();
@@ -47,20 +47,24 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         var movesOrTime = goals.GetGoalForGameMode(LevelLoader.Instance.mode);
         if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
         {
-            timeAndMoves.StartAsMoves(movesOrTime);
+            timeAndMoves.StartAsMoves(LevelLoader.Instance.levelMoves > 0 ? LevelLoader.Instance.levelMoves : movesOrTime);
         }
         else
         {
-            timeAndMoves.StartAsSeconds(movesOrTime);
+            timeAndMoves.StartAsSeconds(LevelLoader.Instance.levelTime > 0 ? LevelLoader.Instance.levelTime : movesOrTime);
         }
         StartCoroutine(ProcessingOnStart());
     }
 
     private void Update()
     {
-        if ((!timeAndMoves.Check() || goals.reached) && !processing)
+        if ((goals.reached || !timeAndMoves.Check() ) && !processing)
         {
             processing = true;
+            if (goals.reached)
+                score.SetTotalScore();
+            else
+                score.current = 0;
             LevelLoader.EndLevel(goals.reached);
         }
     }
@@ -75,11 +79,11 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                 StartCoroutine(Processing());
             }
         }
-        else if (booster == Boosters.BoosterType.Row)
+        else if (booster == Boosters.BoosterType.Erase)
         {
             rowDestoy = true;
         }
-        else if (booster == Boosters.BoosterType.Plus)
+        else if (booster == Boosters.BoosterType.Add)
         {
             if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
             {
@@ -192,8 +196,8 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     {
         processing = true;
 
-        int comboCount = 0;
-        int totalScore = 0;
+        int comboCount = -1;
+        int processingScore = 0;
         while (match.IsAny() || match.SwapsAvailable() == false || reshuffleRequest)
         {
             comboCount++;
@@ -207,14 +211,8 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             {
                 int currentScore = Enumerable.Range(0, destroyed - 3).Select((index) => index).Sum() + destroyed;
                 score.AddScore(currentScore);
-                score.AddDestroyed(destroyed);
-                totalScore += currentScore;
+                processingScore += currentScore;
                 soundManager.PlayPop();
-                int bonus = LevelLoader.LevelBonus(destroyed);
-                if (bonus > 0)
-                {
-                    timeAndMoves.Add(bonus);
-                }
             }
 
             actionAllowed = true; // Can swap while propping
@@ -239,12 +237,19 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             }
         }
 
-        score.AddCombo(comboCount);
-        score.AddScore(totalScore * comboCount - totalScore);
-        score.SetTotalScore();
-        boosters.AddBonus(comboCount);
-        if (timeAndMoves.value <= 0 || goals.reached)
+        if (processingScore > 0)
         {
+            score.AddCombo(comboCount);
+            score.AddScore(10 * comboCount);
+        }
+
+        //boosters.AddBonus(comboCount);
+        if (goals.reached || timeAndMoves.value <= 0)
+        {
+            if (goals.reached)
+                score.SetTotalScore();
+            else
+                score.current = 0;
             LevelLoader.EndLevel(goals.reached);
         }
         processing = false;
@@ -326,10 +331,10 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         }
     }
 
-    public void ShowSelection(Vector2 position)
+    public void ShowSelection(Vector3 position)
     {
         selection.SetActive(true);
-        selection.transform.position = position;
+        selection.transform.position = position + transform.position;
     }
 
     public void HideSelection()

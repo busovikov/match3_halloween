@@ -11,20 +11,16 @@ public class LevelLoader : MonoBehaviour
         Time,
         Moves
     }
-
-    private Animator animator;
-
-    public GameObject credits;
-    public GameObject menu;
-    public GameObject ghost;
+    
     public GameObject endLevelPopup;
-    public Text winLabel;
-    public Text nextLabel;
+
     public GameMode mode = GameMode.Time;
     public float trnsactionTime = 1f;
     public int levelMoves = 0;
     public int levelTime = 0;
     public static LevelLoader Instance;
+    
+    private Animator animator;
     private SoundManager soundManager;
 
     // Start is called before the first frame update
@@ -40,16 +36,10 @@ public class LevelLoader : MonoBehaviour
         else if (Instance != this)
         {
             // TODO: make endgame manager
-            Instance.credits = credits;
-            Instance.menu = menu;
-            Instance.ghost = ghost;
             Instance.endLevelPopup = endLevelPopup;
-            Instance.winLabel = winLabel;
-            Instance.nextLabel = nextLabel;
             Instance.soundManager = soundManager;
             Instance.animator.Rebind();
             Instance.animator.ResetTrigger("Out");
-            //Instance.animator.SetTrigger("Reset");
             Destroy(gameObject);
         }
     }
@@ -64,28 +54,6 @@ public class LevelLoader : MonoBehaviour
         Application.Quit();
     }
 
-    public static void ToCredits()
-    {
-        Instance.menu.SetActive(false);
-        Instance.ghost.SetActive(false);
-        Instance.credits.SetActive(true);
-    }
-
-    public static void BackToMainMenu()
-    {
-        Instance.menu.SetActive(true);
-        Instance.ghost.SetActive(true);
-        Instance.credits.SetActive(false);
-    }
-
-    public static int LevelBonus(int bonus)
-    {
-        if (Instance.mode == GameMode.Moves)
-        {
-            return (int)((bonus - 3)/1.5f);
-        }
-        return bonus - 3;
-    }
     public static void StartGameWithMoves()
     {
         Instance.mode = GameMode.Moves;
@@ -110,19 +78,7 @@ public class LevelLoader : MonoBehaviour
 
     public static void EndLevel(bool win)
     {
-        if (win)
-        {
-            Instance.winLabel.text = "You Win\nNext?";
-            Instance.nextLabel.text = "Next";
-        }
-        else
-        {
-            Instance.winLabel.text = "Not This\nTime!";
-            Instance.nextLabel.text = "Again";
-        }
-
-        Instance.endLevelPopup.SetActive(true);
-        Instance.endLevelPopup.GetComponent<Animator>().SetTrigger("LevelEnd");
+        Instance.endLevelPopup.GetComponent<EndLevel>().Enable(win);
         Instance.soundManager.PlayPopupSound();
     }
 
@@ -153,7 +109,14 @@ public class LevelLoader : MonoBehaviour
             // Check if Back was pressed this frame
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                Exit();
+                if (SceneManager.GetActiveScene().buildIndex == 0)
+                {
+                    Exit();
+                }
+                else 
+                {
+                    GoToMainMenu();
+                }
             }
         }
     }

@@ -37,7 +37,7 @@ public class Goals : MonoBehaviour
             {
                 goal = PlayerPrefs.GetInt(goalTimeString);
             }
-            moves = (goal / 3) * 10;
+            moves = (goal / 3) * 5;
         }
         else
         {
@@ -45,7 +45,7 @@ public class Goals : MonoBehaviour
             {
                 goal = PlayerPrefs.GetInt(goalMovesString);
             }
-            moves = (goal / 3) * 5;
+            moves = (goal / 3) * 2;
         }
         next = goal + 6;
         label.text = goal.ToString();
@@ -62,13 +62,14 @@ public class Goals : MonoBehaviour
     {
         animator.SetTrigger("Add");
         Destroy(collision.gameObject);
+        goal--;
         if (goal > 0)
         {
-            goal--;
             label.text = goal.ToString();
         }
-        else
+        else if (!reached)
         {
+            label.text = 0.ToString();
             if (gameMode == LevelLoader.GameMode.Time)
             {
                 PlayerPrefs.SetInt(goalTimeString, next);

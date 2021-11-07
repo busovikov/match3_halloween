@@ -1007,8 +1007,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
-        m_TargetAssemblyTypeName: LevelLoader, Assembly-CSharp
+      - m_Target: {fileID: 2077809302}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
         m_MethodName: BackToMainMenu
         m_Mode: 1
         m_Arguments:
@@ -1418,8 +1418,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
-        m_TargetAssemblyTypeName: LevelLoader, Assembly-CSharp
+      - m_Target: {fileID: 2077809302}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
         m_MethodName: ToCredits
         m_Mode: 1
         m_Arguments:
@@ -2371,6 +2371,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2077809300}
   - component: {fileID: 2077809301}
+  - component: {fileID: 2077809302}
   m_Layer: 5
   m_Name: Menu
   m_TagString: Untagged
@@ -2417,7 +2418,7 @@ MonoBehaviour:
     m_Left: 0
     m_Right: 0
     m_Top: 400
-    m_Bottom: 100
+    m_Bottom: 150
   m_ChildAlignment: 1
   m_Spacing: -400
   m_ChildForceExpandWidth: 1
@@ -2427,6 +2428,21 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &2077809302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2077809299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe0ef74a97eccdb429900728291e1223, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  credits: {fileID: 0}
+  buttons: {fileID: 0}
+  ghost: {fileID: 0}
 --- !u!1 &2106530956
 GameObject:
   m_ObjectHideFlags: 0
@@ -2768,11 +2784,11 @@ PrefabInstance:
       objectReference: {fileID: 1786375147}
     - target: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
       propertyPath: levelTime
-      value: 60
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5910738033042482114, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
       propertyPath: levelMoves
-      value: 20
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5910738033042482118, guid: 2baf28a3b8f3737449fb8380f9925abb, type: 3}
       propertyPath: m_Name

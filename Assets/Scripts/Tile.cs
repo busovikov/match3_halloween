@@ -16,6 +16,8 @@ public class Tile : MonoBehaviour
     public void AddAction(string action)
     {
         lastaction.Enqueue(action);
+        if (lastaction.Count > 20)
+            lastaction.Dequeue();
     }
 
     private Animator animator;
@@ -40,7 +42,7 @@ public class Tile : MonoBehaviour
         other.invalid = true;
         invalid = true;
 
-        AddAction("ExchangeWith");
+        AddAction("ExchangeWith Invalid = true");
         var tmp = other.content;
         other.content = this.content;
         content = tmp;
@@ -57,21 +59,26 @@ public class Tile : MonoBehaviour
     public IEnumerator SyncContent(Tile other, Action onExchanged)
     {
         AddAction("SyncContent");
-        var until = new WaitUntil(() => IsSet() && other.IsSet());
-        StartCoroutine(SwapAnimation());
-        StartCoroutine(other.SwapAnimation());
+        Coroutine first =  StartCoroutine(SwapAnimation());
+        Coroutine second = StartCoroutine(other.SwapAnimation());
         
-        yield return until;
+        yield return first;
+        yield return second;
+
         if (onExchanged != null)
         {
             onExchanged();
         }
+
+        invalid = false;
+        other.invalid = false;
+        AddAction("SwapAnimation Invalid = false");
     }
     public bool IsSet()
     {
         return content != null && container.transform.position == content.transform.position;
     }
-    public IEnumerator SwapAnimation(Action onMoved = null)
+    public IEnumerator SwapAnimation(bool dropped = false)
     {
         float elapsed = 0f;
         var InitialOffset = content.transform.position;
@@ -92,12 +99,12 @@ public class Tile : MonoBehaviour
             }
         } while (!IsSet());
 
-        invalid = false;
-        yield return null;
-        if (onMoved != null)
+        if (dropped)
         {
-            onMoved();
+            yield return StartCoroutine(WaitDroppedAnimation());
+            invalid = false;
         }
+        
     }
     public void DestroyContent()
     {
@@ -106,6 +113,13 @@ public class Tile : MonoBehaviour
         tileType = 0;
         Destroy(content);
         content = null;
+    }
+
+    public IEnumerator WaitDroppedAnimation()
+    {
+        animator.SetTrigger("Dropped");
+        yield return new WaitForSeconds(1f/5);
+        //yield return null;
     }
     public Coroutine DropTo(Tile tileToDrop)
     {
@@ -121,7 +135,7 @@ public class Tile : MonoBehaviour
             content = null;
             tileType = 0;
             AddAction("DropTo");
-            return StartCoroutine(tileToDrop.SwapAnimation(()=> { tileToDrop.animator.SetTrigger("Dropped"); }));
+            return StartCoroutine(tileToDrop.SwapAnimation(true));
         }
         return null;
     }
@@ -130,14 +144,13 @@ public class Tile : MonoBehaviour
         content = Instantiate(prefab, container.transform.position + offset, Quaternion.identity, container.transform);
         tileType = index;
         
-        Action callback = null;
         if (dropped)
         {
             invalid = true;
-            callback = () => { animator.SetTrigger("Dropped"); };
+            AddAction("CreateContent");
+            return StartCoroutine(SwapAnimation(dropped));
         }
-        AddAction("CreateContent");
-        return StartCoroutine(SwapAnimation(callback));
+        return null;
     }
 
 

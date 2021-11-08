@@ -72,7 +72,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private void Update()
     {
         
-        if (dirty && processing == 0)
+        if (dirty)
         {
             dirty = false;
             HashSet<Vector2> destroy;
@@ -98,18 +98,18 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             if (toSwap != null)
             {
 
-                if (destroy == null || !destroy.Contains(toSwap.first) && !destroy.Contains(toSwap.second))
-                {
-                    tileMap.GetTile(toSwap.first).AddAction("Update() 103");
-                    tileMap.GetTile(toSwap.second).AddAction("Update() 103");
-                    tileMap.GetTile(toSwap.first).ExchangeWith(tileMap.GetTile(toSwap.second), null);
-                }
-                else 
+                if (destroy != null && (destroy.Contains(toSwap.first) || destroy.Contains(toSwap.second)))
                 {
                     if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
                     {
                         timeAndMoves.Sub(1);
                     }
+                }
+                else 
+                {
+                    tileMap.GetTile(toSwap.first).AddAction("Update() 103");
+                    tileMap.GetTile(toSwap.second).AddAction("Update() 103");
+                    tileMap.GetTile(toSwap.first).ExchangeWith(tileMap.GetTile(toSwap.second), null);
                 }
 
 
@@ -166,7 +166,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     {
         if (!tileMap.IsValid(first) || !tileMap.IsValid(second))
             return;
-        actionAllowed = false;
         toSwap = new ToSwap(first, second);
         tileMap.GetTile(toSwap.first).AddAction("Swap() 170");
         tileMap.GetTile(toSwap.second).AddAction("Swap() 170");
@@ -231,6 +230,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     }
     public void OnPointerUp(PointerEventData eventData)
     {
+        actionAllowed = true;
     }
     public void OnDrag(PointerEventData eventData)
     {

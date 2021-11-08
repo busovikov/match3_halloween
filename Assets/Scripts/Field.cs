@@ -97,7 +97,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
             if (toSwap != null)
             {
-
                 if (destroy != null && (destroy.Contains(toSwap.first) || destroy.Contains(toSwap.second)))
                 {
                     if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
@@ -111,9 +110,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                     tileMap.GetTile(toSwap.second).AddAction("Update() 103");
                     tileMap.GetTile(toSwap.first).ExchangeWith(tileMap.GetTile(toSwap.second), null);
                 }
-
-
-                actionAllowed = true;
                 toSwap = null;
             }
         }
@@ -129,21 +125,27 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         }
     }
 
-    private IEnumerator Shuffeling()
+    private IEnumerator Shuffeling(bool once = false)
     {
-        actionAllowed = false;
-        HashSet<Vector2> destroy;
-        while (match.IsAny(out destroy) || match.SwapsAvailable() == false)
+        if (once)
         {
             yield return Reshuffle();
+            dirty = true;
         }
-        actionAllowed = true;
+        else
+        {
+            HashSet<Vector2> destroy;
+            while (match.IsAny(out destroy) || match.SwapsAvailable() == false)
+            {
+                yield return Reshuffle();
+            }
+        }
     }
     public void ActivateBooster(Boosters.BoosterType booster)
     {
         if (booster == Boosters.BoosterType.Mix)
         {
-            StartCoroutine(Reshuffle());
+            StartCoroutine(Shuffeling(true)); // true - Once
         }
         else if (booster == Boosters.BoosterType.Erase)
         {
@@ -166,10 +168,10 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     {
         if (!tileMap.IsValid(first) || !tileMap.IsValid(second))
             return;
-        toSwap = new ToSwap(first, second);
-        tileMap.GetTile(toSwap.first).AddAction("Swap() 170");
-        tileMap.GetTile(toSwap.second).AddAction("Swap() 170");
-        tileMap.GetTile(first).ExchangeWith(tileMap.GetTile(second), () => { dirty = true; });
+       
+        //tileMap.GetTile(toSwap.first).AddAction("Swap() 170");
+        //tileMap.GetTile(toSwap.second).AddAction("Swap() 170");
+        tileMap.GetTile(first).ExchangeWith(tileMap.GetTile(second), () => { toSwap = new ToSwap(first, second); dirty = true; });
     }
     private void SetPosition(Vector2 position)
     {
@@ -178,13 +180,14 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         {
             if (rowDestoy)
             {
+                actionAllowed = false;
                 HideSelection();
                 DestroyRow(offsetPosition);
                 rowDestoy = false;
             }
             else if (firstPosition != invalidPosition && IsNeighbours(firstPosition, offsetPosition))
             {
-                
+                actionAllowed = false;
                 HideSelection();
                 Swap(firstPosition, offsetPosition);
                 firstPosition = invalidPosition;
@@ -277,38 +280,54 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         processing--;
         dirty = true;
     }
+
+    
     private IEnumerator Reshuffle()
     {
         int shuffeling = 0;
         var until = new WaitUntil(() => shuffeling == 0);
-        List<int> axis_y = Enumerable.Range(0, tileMap.height).Select((index) => index).ToList();
+        List<int> axis_y = Enumerable.Range(0, tileMap.height + 1).Select((index) => index - 1).ToList();
         List<List<int>> remainingPositions = new List<List<int>>();
 
         for (int i = 0; i < tileMap.width; i++)
         {
+            axis_y[0] = i;
             remainingPositions.Add(new List<int>(axis_y));
         }
 
         int swap_x = 0;
         int swap_y = 0;
         bool swap = false;
-        while (remainingPositions.Count > 0)
-        {
-            var new_x = UnityEngine.Random.Range(0, remainingPositions.Count);
-            var new_y = UnityEngine.Random.Range(0, remainingPositions[new_x].Count);
-            remainingPositions[new_x].RemoveAt(new_y);
-            if (remainingPositions[new_x].Count == 0)
-            {
-                remainingPositions.RemoveAt(new_x);
-            }
+        Queue<string> s = new Queue<string>();
 
-            if (!tileMap.IsValid(swap_x, swap_y) || !tileMap.IsValid(new_x, new_y))
-                continue;
+        for (int i = 0; i <  tileMap.width * tileMap.height; i++)
+        {
+            int index_x = UnityEngine.Random.Range(0, remainingPositions.Count);
+            int index_y = UnityEngine.Random.Range(1, remainingPositions[index_x].Count);
+            int new_y = remainingPositions[index_x][index_y];
+            int new_x = remainingPositions[index_x][0];
+            Debug.Log(new_x.ToString() + " " + new_y.ToString());
+            try
+            {
+                remainingPositions[index_x].RemoveAt(index_y);
+                if (remainingPositions[index_x].Count == 1)
+                {
+                    remainingPositions.RemoveAt(index_x);
+                }
+            }
+            catch
+            {
+                Debug.Log(new_x.ToString() + " " + new_y.ToString());
+            }
 
             if (swap)
             {
                 shuffeling++;
-                tileMap.GetTile(swap_x, swap_y).ExchangeWith(tileMap.GetTile(new_x, new_y), ()=> { shuffeling--; });
+                //s.Enqueue( "shufeling..." + swap_x.ToString() + " " + swap_y.ToString() + " -- " + new_x.ToString() + " " + new_y.ToString());
+                if (!tileMap.GetTile(swap_x, swap_y).ExchangeWith(tileMap.GetTile(new_x, new_y), () => { shuffeling--;  }))
+                {
+                    continue;
+                }
             }
             else 
             {
@@ -319,7 +338,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             swap = !swap;
         }
         yield return until;
-
     }
     private IEnumerator DropAndReplaceWithNew(int x)
     {

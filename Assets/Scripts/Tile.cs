@@ -34,10 +34,10 @@ public class Tile : MonoBehaviour
         else if (content != null)
             content.GetComponent<SpriteRenderer>().color = Color.white;
     }
-    public void ExchangeWith(Tile other, Action onExchanged)
+    public bool ExchangeWith(Tile other, Action onExchanged)
     {
         if (content == null || other.content == null)
-            return;
+            return false;
 
         other.invalid = true;
         invalid = true;
@@ -55,6 +55,7 @@ public class Tile : MonoBehaviour
         tileType = type;
 
         StartCoroutine(SyncContent(other, onExchanged));
+        return true;
     }
     public IEnumerator SyncContent(Tile other, Action onExchanged)
     {

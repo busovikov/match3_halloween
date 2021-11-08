@@ -9,16 +9,30 @@ public class Tile : MonoBehaviour
     public GameObject container;
     public GameObject content;
     public int tileType;
+    public bool invalid = false;
 
     private Animator animator;
     private void Awake()
     {
         animator = GetComponent<Animator>();
     }
-    public void ExchangeWith(Tile other, Action onExchanged)
+
+    private void Update()
+    {
+        /*
+        if (invalid && content != null)
+            content.GetComponent<SpriteRenderer>().color = Color.red;
+        else if (content != null)
+            content.GetComponent<SpriteRenderer>().color = Color.white;
+        */
+    }
+    public bool ExchangeWith(Tile other, Action onExchanged)
     {
         if (content == null || other.content == null)
-            return;
+            return false;
+
+        other.invalid = true;
+        invalid = true;
 
         var tmp = other.content;
         other.content = this.content;
@@ -32,60 +46,71 @@ public class Tile : MonoBehaviour
         tileType = type;
 
         StartCoroutine(SyncContent(other, onExchanged));
+        return true;
     }
     public IEnumerator SyncContent(Tile other, Action onExchanged)
     {
-        var until = new WaitUntil(() => IsSet() && other.IsSet());
-        StartCoroutine(SwapAnimation());
-        StartCoroutine(other.SwapAnimation());
-        yield return until;
+        Coroutine first =  StartCoroutine(SwapAnimation());
+        Coroutine second = StartCoroutine(other.SwapAnimation());
+        
+        yield return first;
+        yield return second;
+
         if (onExchanged != null)
         {
             onExchanged();
         }
+
+        invalid = false;
+        other.invalid = false;
     }
     public bool IsSet()
     {
         return content != null && container.transform.position == content.transform.position;
     }
-    public IEnumerator SwapAnimation(Action onMoved = null)
+    public IEnumerator SwapAnimation(bool dropped = false)
     {
         float elapsed = 0f;
+        float duration = 0.2f;
         var InitialOffset = content.transform.position;
-        float path = (InitialOffset - container.transform.position).magnitude / 10;
         
-        do
+        while(elapsed < duration)
         {
-            yield return null;
+            content.transform.position = Vector2.Lerp(InitialOffset, container.transform.position, elapsed / duration);
             elapsed += Time.deltaTime;
-            var weight = Math.Min(1, elapsed / 0.2f);
-            content.transform.position = Vector3.Lerp(InitialOffset, container.transform.position, weight);
-        } while (!IsSet());
-
-        yield return null;
-        if (onMoved != null)
-        {
-            onMoved();
+            yield return null;
         }
+        content.transform.position = container.transform.position;
+
+        if (dropped)
+        {
+            animator.SetTrigger("Dropped");
+            invalid = false;
+        }
+        
     }
     public void DestroyContent()
     {
-        StopCoroutine(SwapAnimation());
+        //StopCoroutine(SwapAnimation());
         tileType = 0;
         Destroy(content);
         content = null;
     }
+
     public Coroutine DropTo(Tile tileToDrop)
     {
         if (content != null)
         {
+            //StopCoroutine(SwapAnimation());
+            tileToDrop.StopCoroutine(SwapAnimation());
+            tileToDrop.invalid = true;
             tileToDrop.content = content;
             tileToDrop.tileType = tileType;
             tileToDrop.content.transform.SetParent(tileToDrop.container.transform);
 
             content = null;
             tileType = 0;
-            return StartCoroutine(tileToDrop.SwapAnimation(()=> { tileToDrop.animator.SetTrigger("Dropped"); }));
+            return StartCoroutine(tileToDrop.SwapAnimation(true));
         }
         return null;
     }
@@ -93,12 +118,13 @@ public class Tile : MonoBehaviour
     {
         content = Instantiate(prefab, container.transform.position + offset, Quaternion.identity, container.transform);
         tileType = index;
-        Action callback = null;
+        
         if (dropped)
         {
-            callback = () => { animator.SetTrigger("Dropped"); };
+            invalid = true;
+            return StartCoroutine(SwapAnimation(dropped));
         }
-        return StartCoroutine(SwapAnimation(callback));
+        return null;
     }
 
 

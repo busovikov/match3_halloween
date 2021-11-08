@@ -11,10 +11,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private new BoxCollider2D collider;
     private static Vector2 invalidPosition = Vector2.left;
     private Vector2 firstPosition = invalidPosition;
-    private bool processing = false;
-    private bool actionAllowed = true;
-    private bool reshuffleRequest = false;
-    private bool rowDestoy = false;
 
     private Goals goals;
     private TileMap tileMap;
@@ -23,6 +19,24 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private TimeAndMoves timeAndMoves;
     private SoundManager soundManager;
     private Boosters boosters;
+    private int comboCount = -1;
+    private int processing = 0;
+    private bool dirty = false;
+    private bool actionAllowed = true;
+    private bool rowDestoy = false;
+
+    private class ToSwap
+    {
+        public ToSwap(Vector2 f, Vector2 s) 
+        {
+            first = f;
+            second = s;
+        }
+        public Vector2 first;
+        public Vector2 second;
+    }
+
+    private ToSwap toSwap;
 
     // Start is called before the first frame update
     void Awake()
@@ -53,14 +67,54 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         {
             timeAndMoves.StartAsSeconds(LevelLoader.Instance.levelTime > 0 ? LevelLoader.Instance.levelTime : movesOrTime);
         }
-        StartCoroutine(ProcessingOnStart());
     }
 
     private void Update()
     {
-        if ((goals.reached || !timeAndMoves.Check() ) && !processing)
+        
+        if (dirty)
         {
-            processing = true;
+            dirty = false;
+            HashSet<Vector2> destroy;
+            if (match.IsAny(out destroy))
+            {
+                StartCoroutine(Processing(destroy));
+            }
+            else
+            {
+                if (comboCount >= 0)
+                {
+                    score.AddCombo(comboCount);
+                    score.AddScore(10 * comboCount);
+                    comboCount = -1;
+                }
+
+                if (match.SwapsAvailable() == false)
+                {
+                    StartCoroutine(Shuffeling());
+                }
+            }
+
+            if (toSwap != null)
+            {
+                if (destroy != null && (destroy.Contains(toSwap.first) || destroy.Contains(toSwap.second)))
+                {
+                    if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
+                    {
+                        timeAndMoves.Sub(1);
+                    }
+                }
+                else 
+                {
+                    tileMap.GetTile(toSwap.first).ExchangeWith(tileMap.GetTile(toSwap.second), null);
+                }
+                toSwap = null;
+            }
+        }
+
+        if ((goals.reached || !timeAndMoves.Check() ) && processing == 0)
+        {
+            processing++;
             if (goals.reached)
                 score.SetTotalScore();
             else
@@ -69,15 +123,27 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         }
     }
 
+    private IEnumerator Shuffeling(bool once = false)
+    {
+        if (once)
+        {
+            yield return Reshuffle();
+            dirty = true;
+        }
+        else
+        {
+            HashSet<Vector2> destroy;
+            while (match.IsAny(out destroy) || match.SwapsAvailable() == false)
+            {
+                yield return Reshuffle();
+            }
+        }
+    }
     public void ActivateBooster(Boosters.BoosterType booster)
     {
         if (booster == Boosters.BoosterType.Mix)
         {
-            reshuffleRequest = true;
-            if (!processing)
-            {
-                StartCoroutine(Processing());
-            }
+            StartCoroutine(Shuffeling(true)); // true - Once
         }
         else if (booster == Boosters.BoosterType.Erase)
         {
@@ -100,27 +166,8 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     {
         if (!tileMap.IsValid(first) || !tileMap.IsValid(second))
             return;
-        var one = tileMap.GetTile(first);
-        var two = tileMap.GetTile(second);
-
-        one.ExchangeWith(two, () => 
-        {
-            if (match.IsAnyMatch(first,second))
-            {
-                if (!processing)
-                {
-                    StartCoroutine(Processing());
-                }
-                if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
-                {
-                    timeAndMoves.Sub(1);
-                }
-            }
-            else
-            {
-                one.ExchangeWith(two, null);
-            }
-        });
+       
+        tileMap.GetTile(first).ExchangeWith(tileMap.GetTile(second), () => { toSwap = new ToSwap(first, second); dirty = true; });
     }
     private void SetPosition(Vector2 position)
     {
@@ -154,8 +201,15 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         if (!tileMap.IsValid(position))
             return;
 
-        match.SetRowForDestruction((int)position.y);
-        StartCoroutine(Processing());
+        HashSet<Vector2> row = new HashSet<Vector2>(); 
+        for (int x = 0; x < tileMap.width; x++)
+        {
+            Vector2 pos = new Vector2(x, position.y);
+            tileMap.GetTile(pos).invalid = true;
+            row.Add(pos);
+        }
+
+        StartCoroutine(Processing(row));
     }
 
     private Vector2 ToField(Vector2 position)
@@ -181,108 +235,81 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     {
         SetPosition(eventData.pointerCurrentRaycast.worldPosition);
     }
-    private IEnumerator ProcessingOnStart()
+    private IEnumerator Processing(HashSet<Vector2> destroy)
     {
-        processing = true;
-        yield return new WaitForSeconds(0.5f);
-        while (match.IsAny() || match.SwapsAvailable() == false)
+        if (destroy == null || destroy.Count == 0)
+            yield break;
+
+        processing++;
+        comboCount++;
+        foreach (var p in destroy)
         {
-            match.ExecuteAndClear(null);
-            yield return Reshuffle();
+            Tile item = tileMap.GetTile(p);
+            tileMap.SpawnDead(item.tileType, item.transform);
+            item.DestroyContent();
         }
-        processing = false;
+        
+        if (destroy.Count > 0)
+        {
+            int currentScore = Enumerable.Range(0, destroy.Count - 3).Select((index) => index).Sum() + destroy.Count;
+            score.AddScore(currentScore);
+            soundManager.PlayPop();
+        }
+
+        yield return new WaitForSeconds(0.2f);
+
+        List<Coroutine> dropAll = new List<Coroutine>();
+        for (int x = 0; x < tileMap.width; x++)
+        {
+                dropAll.Add(StartCoroutine(DropAndReplaceWithNew(x)));
+        }
+
+        foreach (Coroutine dropTask in dropAll)
+        {
+            yield return dropTask;
+        }
+        
+        processing--;
+        dirty = true;
     }
-    private IEnumerator Processing()
-    {
-        processing = true;
 
-        int comboCount = -1;
-        int processingScore = 0;
-        while (match.IsAny() || match.SwapsAvailable() == false || reshuffleRequest)
-        {
-            comboCount++;
-            int destroyed = match.ExecuteAndClear((item) =>
-            {
-                tileMap.SpawnDead(item.tileType, item.transform);
-                item.DestroyContent();
-            });
-
-            if (destroyed > 0)
-            {
-                int currentScore = Enumerable.Range(0, destroyed - 3).Select((index) => index).Sum() + destroyed;
-                score.AddScore(currentScore);
-                processingScore += currentScore;
-                soundManager.PlayPop();
-            }
-
-            actionAllowed = true; // Can swap while propping
-
-            yield return new WaitForSeconds(0.2f);
-
-            List<Coroutine> dropAll = new List<Coroutine>();
-            for (int x = 0; x < tileMap.width; x++)
-            {
-                 dropAll.Add(StartCoroutine(DropAndReplaceWithNew(x)));
-            }
-
-            foreach (Coroutine dropTask in dropAll)
-            {
-                yield return dropTask;
-            }
-
-            while (match.IsAny() == false && match.SwapsAvailable() == false || reshuffleRequest )
-            {
-                reshuffleRequest = false;
-                yield return Reshuffle();
-            }
-        }
-
-        if (processingScore > 0)
-        {
-            score.AddCombo(comboCount);
-            score.AddScore(10 * comboCount);
-        }
-
-        //boosters.AddBonus(comboCount);
-        if (goals.reached || timeAndMoves.value <= 0)
-        {
-            if (goals.reached)
-                score.SetTotalScore();
-            else
-                score.current = 0;
-            LevelLoader.EndLevel(goals.reached);
-        }
-        processing = false;
-    }
+    
     private IEnumerator Reshuffle()
     {
-        int processing = 0;
-        var until = new WaitUntil(() => processing == 0);
-        List<int> axis_y = Enumerable.Range(0, tileMap.height).Select((index) => index).ToList();
+        int shuffeling = 0;
+        var until = new WaitUntil(() => shuffeling == 0);
+        List<int> axis_y = Enumerable.Range(0, tileMap.height + 1).Select((index) => index - 1).ToList();
         List<List<int>> remainingPositions = new List<List<int>>();
 
         for (int i = 0; i < tileMap.width; i++)
         {
+            axis_y[0] = i;
             remainingPositions.Add(new List<int>(axis_y));
         }
 
         int swap_x = 0;
         int swap_y = 0;
         bool swap = false;
-        while (remainingPositions.Count > 0)
-        {
-            var new_x = UnityEngine.Random.Range(0, remainingPositions.Count);
-            var new_y = UnityEngine.Random.Range(0, remainingPositions[new_x].Count);
-            remainingPositions[new_x].RemoveAt(new_y);
-            if (remainingPositions[new_x].Count == 0)
-            {
-                remainingPositions.RemoveAt(new_x);
-            }
 
+        for (int i = 0; i <  tileMap.width * tileMap.height; i++)
+        {
+            int index_x = UnityEngine.Random.Range(0, remainingPositions.Count);
+            int index_y = UnityEngine.Random.Range(1, remainingPositions[index_x].Count);
+            int new_y = remainingPositions[index_x][index_y];
+            int new_x = remainingPositions[index_x][0];
+            remainingPositions[index_x].RemoveAt(index_y);
+            if (remainingPositions[index_x].Count == 1)
+            {
+                remainingPositions.RemoveAt(index_x);
+            }
+            
             if (swap)
             {
-                processing++;
-                tileMap.GetTile(swap_x, swap_y).ExchangeWith(tileMap.GetTile(new_x, new_y), ()=> { processing--; });
+                shuffeling++;
+                if (!tileMap.GetTile(swap_x, swap_y).ExchangeWith(tileMap.GetTile(new_x, new_y), () => { shuffeling--;  }))
+                {
+                    continue;
+                }
             }
             else 
             {
@@ -292,10 +319,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
             swap = !swap;
         }
-
         yield return until;
-
-        
     }
     private IEnumerator DropAndReplaceWithNew(int x)
     {

@@ -106,8 +106,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                 }
                 else 
                 {
-                    tileMap.GetTile(toSwap.first).AddAction("Update() 103");
-                    tileMap.GetTile(toSwap.second).AddAction("Update() 103");
                     tileMap.GetTile(toSwap.first).ExchangeWith(tileMap.GetTile(toSwap.second), null);
                 }
                 toSwap = null;
@@ -169,8 +167,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         if (!tileMap.IsValid(first) || !tileMap.IsValid(second))
             return;
        
-        //tileMap.GetTile(toSwap.first).AddAction("Swap() 170");
-        //tileMap.GetTile(toSwap.second).AddAction("Swap() 170");
         tileMap.GetTile(first).ExchangeWith(tileMap.GetTile(second), () => { toSwap = new ToSwap(first, second); dirty = true; });
     }
     private void SetPosition(Vector2 position)
@@ -250,10 +246,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         {
             Tile item = tileMap.GetTile(p);
             tileMap.SpawnDead(item.tileType, item.transform);
-            if (!item.IsSet())
-            {
-                Debug.Log("Deleting what moving");            
-            }
             item.DestroyContent();
         }
         
@@ -298,7 +290,6 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         int swap_x = 0;
         int swap_y = 0;
         bool swap = false;
-        Queue<string> s = new Queue<string>();
 
         for (int i = 0; i <  tileMap.width * tileMap.height; i++)
         {
@@ -306,24 +297,15 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             int index_y = UnityEngine.Random.Range(1, remainingPositions[index_x].Count);
             int new_y = remainingPositions[index_x][index_y];
             int new_x = remainingPositions[index_x][0];
-            Debug.Log(new_x.ToString() + " " + new_y.ToString());
-            try
+            remainingPositions[index_x].RemoveAt(index_y);
+            if (remainingPositions[index_x].Count == 1)
             {
-                remainingPositions[index_x].RemoveAt(index_y);
-                if (remainingPositions[index_x].Count == 1)
-                {
-                    remainingPositions.RemoveAt(index_x);
-                }
+                remainingPositions.RemoveAt(index_x);
             }
-            catch
-            {
-                Debug.Log(new_x.ToString() + " " + new_y.ToString());
-            }
-
+            
             if (swap)
             {
                 shuffeling++;
-                //s.Enqueue( "shufeling..." + swap_x.ToString() + " " + swap_y.ToString() + " -- " + new_x.ToString() + " " + new_y.ToString());
                 if (!tileMap.GetTile(swap_x, swap_y).ExchangeWith(tileMap.GetTile(new_x, new_y), () => { shuffeling--;  }))
                 {
                     continue;

@@ -119,7 +119,6 @@ public class Match
         }
         if (tiles.IsValid(x, y))
         {
-            tiles.GetTile(x,y).AddAction("Add VALID");
             set.Add(new Vector2(x, y));
         }
     }
@@ -128,7 +127,7 @@ public class Match
     {
         if (set.Count >= 3)
         {
-            foreach (Vector2 v in set) { tiles.GetTile(v).invalid = true; tiles.GetTile(v).AddAction("Sink Invalid"); }
+            foreach (Vector2 v in set) { tiles.GetTile(v).invalid = true; }
             toBeDestroyed.UnionWith(set);
         }
         set.Clear();

@@ -11,28 +11,20 @@ public class Tile : MonoBehaviour
     public int tileType;
     public bool invalid = false;
 
-    private Queue<string> lastaction;
-
-    public void AddAction(string action)
-    {
-        lastaction.Enqueue(action);
-        if (lastaction.Count > 20)
-            lastaction.Dequeue();
-    }
-
     private Animator animator;
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        lastaction = new Queue<string>(10);
-}
+    }
 
     private void Update()
     {
+        /*
         if (invalid && content != null)
             content.GetComponent<SpriteRenderer>().color = Color.red;
         else if (content != null)
             content.GetComponent<SpriteRenderer>().color = Color.white;
+        */
     }
     public bool ExchangeWith(Tile other, Action onExchanged)
     {
@@ -42,7 +34,6 @@ public class Tile : MonoBehaviour
         other.invalid = true;
         invalid = true;
 
-        AddAction("ExchangeWith Invalid = true");
         var tmp = other.content;
         other.content = this.content;
         content = tmp;
@@ -59,7 +50,6 @@ public class Tile : MonoBehaviour
     }
     public IEnumerator SyncContent(Tile other, Action onExchanged)
     {
-        AddAction("SyncContent");
         Coroutine first =  StartCoroutine(SwapAnimation());
         Coroutine second = StartCoroutine(other.SwapAnimation());
         
@@ -73,7 +63,6 @@ public class Tile : MonoBehaviour
 
         invalid = false;
         other.invalid = false;
-        AddAction("SwapAnimation Invalid = false");
     }
     public bool IsSet()
     {
@@ -82,51 +71,37 @@ public class Tile : MonoBehaviour
     public IEnumerator SwapAnimation(bool dropped = false)
     {
         float elapsed = 0f;
+        float duration = 0.2f;
         var InitialOffset = content.transform.position;
-        float path = (InitialOffset - container.transform.position).magnitude / 10;
         
-        do
+        while(elapsed < duration)
         {
-            yield return null;
+            content.transform.position = Vector2.Lerp(InitialOffset, container.transform.position, elapsed / duration);
             elapsed += Time.deltaTime;
-            var weight = Math.Min(1, elapsed / 0.2f);
-            try
-            {
-                content.transform.position = Vector3.Lerp(InitialOffset, container.transform.position, weight);
-            }
-            catch
-            {
-                Debug.Log("Catch " + name);
-            }
-        } while (!IsSet());
+            yield return null;
+        }
+        content.transform.position = container.transform.position;
 
         if (dropped)
         {
-            yield return StartCoroutine(WaitDroppedAnimation());
+            animator.SetTrigger("Dropped");
             invalid = false;
         }
         
     }
     public void DestroyContent()
     {
-        AddAction("DestroyContent");
-        StopCoroutine(SwapAnimation());
+        //StopCoroutine(SwapAnimation());
         tileType = 0;
         Destroy(content);
         content = null;
     }
 
-    public IEnumerator WaitDroppedAnimation()
-    {
-        animator.SetTrigger("Dropped");
-        yield return new WaitForSeconds(1f/5);
-        //yield return null;
-    }
     public Coroutine DropTo(Tile tileToDrop)
     {
         if (content != null)
         {
-            StopCoroutine(SwapAnimation());
+            //StopCoroutine(SwapAnimation());
             tileToDrop.StopCoroutine(SwapAnimation());
             tileToDrop.invalid = true;
             tileToDrop.content = content;
@@ -135,7 +110,6 @@ public class Tile : MonoBehaviour
 
             content = null;
             tileType = 0;
-            AddAction("DropTo");
             return StartCoroutine(tileToDrop.SwapAnimation(true));
         }
         return null;
@@ -148,7 +122,6 @@ public class Tile : MonoBehaviour
         if (dropped)
         {
             invalid = true;
-            AddAction("CreateContent");
             return StartCoroutine(SwapAnimation(dropped));
         }
         return null;

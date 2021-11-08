@@ -64,7 +64,7 @@ public class EndLevel : MonoBehaviour
         gameObject.SetActive(true);
         if (win)
         {
-            winLabel.text = "You Win Next?";
+            winLabel.text = "Victory!";
             nextBtnLabel.text = "Next";
         }
         else

@@ -15,6 +15,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private Goals goals;
     private TileMap tileMap;
     private Match match;
+    private UIManager uiManager;
     private ScoreManager score;
     private TimeAndMoves timeAndMoves;
     private SoundManager soundManager;
@@ -43,6 +44,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     {
         boosters = FindObjectOfType<Boosters>();
         boosters.InitBoosters(ActivateBooster);
+        uiManager = FindObjectOfType<UIManager>();
         soundManager = FindObjectOfType<SoundManager>();
         tileMap = GetComponent<TileMap>();
         goals = tileMap.goal.GetComponent<Goals>();
@@ -91,6 +93,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
                 if (match.SwapsAvailable() == false)
                 {
+                    uiManager.ShowNoMatches();
                     StartCoroutine(Shuffeling());
                 }
             }

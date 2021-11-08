@@ -9,6 +9,8 @@ public class Match
     private HashSet<Vector2> toBeDestroyed;
     private List<Vector2> setX;
     private List<Vector2>[] setY;
+
+    public bool bisy = false;
     public Match(TileMap tilesMap)
     {
         tiles = tilesMap;
@@ -18,25 +20,7 @@ public class Match
     {
         return toBeDestroyed.Count > 0;
     }
-    public int ExecuteAndClear(Action<Tile> callback)
-    {
-        if(callback != null)
-            foreach (var item in toBeDestroyed)
-            {
-                callback(tiles.GetTile(item));
-            }
-        int destroyed = toBeDestroyed.Count;
-        toBeDestroyed.Clear();
-        return destroyed;
-    }
 
-    public void SetRowForDestruction(int row)
-    {
-        for (int x = 0; x < tiles.width; x++)
-        {
-            toBeDestroyed.Add(new Vector2(x, row));
-        }
-    }
     public bool SwapsAvailable()
     {
         for (int x = 0; x < tiles.width; x++)
@@ -101,15 +85,10 @@ public class Match
         }
     }
 
-    public bool IsAnyMatch(Vector2 one, Vector2 two)
+    public bool IsAny(out HashSet<Vector2> destructionList)
     {
-        return IsAny(true) && (toBeDestroyed.Contains(one) || toBeDestroyed.Contains(two));
-    }
-    public bool IsAny(bool force = false)
-    {
-        if (!force && ToBeDestroyed())
-            return true;
-
+        bisy = true;
+        destructionList = null;
         InitSets();
         for (int y = 0; y < tiles.height; y++)
         {
@@ -123,8 +102,14 @@ public class Match
         }
         for (int x = 0; x < tiles.width; x++)
             Sink(setY[x]);
-        
-        return ToBeDestroyed();
+        bisy = false;
+        if (ToBeDestroyed())
+        {
+            destructionList = new HashSet<Vector2>(toBeDestroyed);
+            toBeDestroyed.Clear();
+            return true;
+        }
+        return false;
     }
     private void StackOn(int x, int y, List<Vector2> set)
     {
@@ -135,9 +120,6 @@ public class Match
         if (tiles.IsValid(x, y))
         {
             set.Add(new Vector2(x, y));
-            var s = "";
-            foreach (var i in set)
-                s += " " + i.ToString();
         }
     }
 
@@ -145,6 +127,7 @@ public class Match
     {
         if (set.Count >= 3)
         {
+            foreach (Vector2 v in set) { tiles.GetTile(v).invalid = true; }
             toBeDestroyed.UnionWith(set);
         }
         set.Clear();

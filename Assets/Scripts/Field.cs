@@ -77,7 +77,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         if (dirty)
         {
             dirty = false;
-            HashSet<Vector2> destroy;
+            HashSet<Vector3> destroy;
             if (match.IsAny(out destroy))
             {
                 StartCoroutine(Processing(destroy));
@@ -135,7 +135,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         }
         else
         {
-            HashSet<Vector2> destroy;
+            HashSet<Vector3> destroy;
             while (match.IsAny(out destroy) || match.SwapsAvailable() == false)
             {
                 yield return Reshuffle();
@@ -204,7 +204,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         if (!tileMap.IsValid(position))
             return;
 
-        HashSet<Vector2> row = new HashSet<Vector2>(); 
+        HashSet<Vector3> row = new HashSet<Vector3>(); 
         for (int x = 0; x < tileMap.width; x++)
         {
             Vector2 pos = new Vector2(x, position.y);
@@ -238,7 +238,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     {
         SetPosition(eventData.pointerCurrentRaycast.worldPosition);
     }
-    private IEnumerator Processing(HashSet<Vector2> destroy)
+    private IEnumerator Processing(HashSet<Vector3> destroy)
     {
         if (destroy == null || destroy.Count == 0)
             yield break;

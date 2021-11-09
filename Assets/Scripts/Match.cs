@@ -6,15 +6,16 @@ using UnityEngine;
 public class Match 
 {
     private TileMap tiles;
-    private HashSet<Vector2> toBeDestroyed;
-    private List<Vector2> setX;
-    private List<Vector2>[] setY;
+    private List<Vector3> toBeDestroyed;
+    private List<Vector3> setX;
+    private List<Vector3>[] setY;
 
     public bool bisy = false;
     public Match(TileMap tilesMap)
     {
         tiles = tilesMap;
-        toBeDestroyed = new HashSet<Vector2>();
+        toBeDestroyed = new List<Vector3>(tiles.width * tiles.height);
+        InitSets();
     }
     public bool ToBeDestroyed()
     {
@@ -75,21 +76,17 @@ public class Match
     }
     private void InitSets()
     {
-        setX = new List<Vector2>();
-        setX.Capacity = tiles.width;
-        setY = new List<Vector2>[tiles.width];
+        setX = new List<Vector3>(tiles.width);
+        setY = new List<Vector3>[tiles.width];
         for (int i = 0; i < tiles.width; i++)
         {
-            setY[i] = new List<Vector2>();
-            setY[i].Capacity = tiles.height;
+            setY[i] = new List<Vector3>(tiles.height);
         }
     }
 
-    public bool IsAny(out HashSet<Vector2> destructionList)
+    public bool IsAny(out HashSet<Vector3> destructionList)
     {
-        bisy = true;
         destructionList = null;
-        InitSets();
         for (int y = 0; y < tiles.height; y++)
         {
             for (int x = 0; x < tiles.width; x++)
@@ -102,33 +99,34 @@ public class Match
         }
         for (int x = 0; x < tiles.width; x++)
             Sink(setY[x]);
-        bisy = false;
+        
         if (ToBeDestroyed())
         {
-            destructionList = new HashSet<Vector2>(toBeDestroyed);
+            destructionList = new HashSet<Vector3>(toBeDestroyed);
             toBeDestroyed.Clear();
             return true;
         }
         return false;
     }
-    private void StackOn(int x, int y, List<Vector2> set)
+    private void StackOn(int x, int y, List<Vector3> set)
     {
-        if (set.Count > 0 && tiles.GetType(set[0]) != tiles.GetType(x, y))
+        int type = tiles.GetType(x, y);
+        if (set.Count > 0 && set[0].z != type) // Store type in z to avoid checking for validity
         {
             Sink(set);
         }
         if (tiles.IsValid(x, y))
         {
-            set.Add(new Vector2(x, y));
+            set.Add(new Vector3(x, y, type));
         }
     }
 
-    private void Sink(List<Vector2> set)
+    private void Sink(List<Vector3> set)
     {
         if (set.Count >= 3)
         {
-            foreach (Vector2 v in set) { tiles.GetTile(v).invalid = true; }
-            toBeDestroyed.UnionWith(set);
+            foreach (Vector3 v in set) { tiles.GetTile(v).invalid = true; }
+            toBeDestroyed.AddRange(set);
         }
         set.Clear();
     }

@@ -12,18 +12,22 @@ public class TileMap : MonoBehaviour
     public GameObject[] TilePool;
     public GameObject[] DeadTilePool;
 
-    private GameObject[,] tiles;
+    private Tile[,] tiles;
     private int goalType;
+
+    //private GameObject[,] DeadPool;
     void Awake()
     {
-        tiles = new GameObject[width, height];
+        tiles = new Tile[width, height];
+
+        //DeadPool = new GameObject[TilePool.Length, (int)(width * height / 2)];
 
         List<int> types = Enumerable.Range(0, TilePool.Length).Select((index) => index).ToList();
         for (int i = 0; i < width; i++)
             for (int j = 0; j < height; j++)
             {
                 var position = new Vector3(i, j, 0) + transform.position;
-                GameObject tile = GameObject.Instantiate(prefab, position, Quaternion.identity, transform);
+                Tile tile = GameObject.Instantiate(prefab, position, Quaternion.identity, transform).GetComponent<Tile>();
                 tile.name = i.ToString() + "," + j.ToString();
                 tiles[i, j] = tile;
                 InitContent(i, j, types);
@@ -66,7 +70,7 @@ public class TileMap : MonoBehaviour
     }
     public Tile GetTile(int x, int y)
     {
-        return tiles[x, y].GetComponent<Tile>();
+        return tiles[x, y];
     }
     public int GetType(Vector2 arrayPosition)
     {
@@ -77,7 +81,7 @@ public class TileMap : MonoBehaviour
     {
         if (!IsValid(x, y))
             return -1;
-        return tiles[x, y].GetComponent<Tile>().tileType;
+        return tiles[x, y].tileType;
     }
     public bool IsValid(Vector2 arrayPosition)
     {
@@ -87,7 +91,7 @@ public class TileMap : MonoBehaviour
     public bool IsValid(int x, int y)
     {
         bool withInBoundaries = y >= 0 && y < height && x >= 0 && x < width;
-        return withInBoundaries && !GetTile(x, y).invalid && GetTile(x, y).IsSet();
+        return withInBoundaries && !tiles[x, y].invalid && tiles[x, y].IsSet();
     }
 
     internal void SpawnDead(int tileType, Transform transform)

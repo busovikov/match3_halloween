@@ -17,15 +17,6 @@ public class Tile : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    private void Update()
-    {
-        /*
-        if (invalid && content != null)
-            content.GetComponent<SpriteRenderer>().color = Color.red;
-        else if (content != null)
-            content.GetComponent<SpriteRenderer>().color = Color.white;
-        */
-    }
     public bool ExchangeWith(Tile other, Action onExchanged)
     {
         if (content == null || other.content == null)

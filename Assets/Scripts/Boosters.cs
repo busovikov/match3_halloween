@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,13 +31,16 @@ public class Boosters : MonoBehaviour
         public float cooldown = 10;
 
         public delegate void ActivateBoosterCallback(BoosterType booster);
+        private StringBuilder stringBuilder = new StringBuilder(10);
 
         private float timer = 0;
         private ActivateBoosterCallback activate;
 
         private string Name()
         {
-            return "Booster." + type.ToString();
+            string s = stringBuilder.AppendFormat("Booster.{0}", amount).ToString();
+            stringBuilder.Clear();
+            return s;
         }
 
         public void Save()
@@ -70,18 +74,25 @@ public class Boosters : MonoBehaviour
 
         public void Update()
         {
+            if (timer <= 0)
+            {
+                btn.interactable = amount > 0;
+            }
+            else
+            {
+                btn.interactable = false;
+                timer -= Time.deltaTime;
+            }
+
+            
+        }
+
+        private void UpdateLable()
+        {
             if (label != null)
             {
                 label.text = amount.ToString();
-                if (timer <= 0)
-                {
-                    btn.interactable = amount > 0;
-                }
-                else
-                {
-                    btn.interactable = false;
-                    timer -= Time.deltaTime;
-                }
+
             }
         }
 
@@ -91,6 +102,7 @@ public class Boosters : MonoBehaviour
             {
                 amount++;
                 animation.SetTrigger("Add");
+                UpdateLable();
             }
             Save();
         }
@@ -100,6 +112,7 @@ public class Boosters : MonoBehaviour
             if (amount > 0)
             {
                 amount--;
+                UpdateLable();
             }
             Save();
         }
@@ -114,6 +127,7 @@ public class Boosters : MonoBehaviour
             {
                 amount = 1;
             }
+            UpdateLable();
             animation.SetTrigger("Add");
             Save();
         }

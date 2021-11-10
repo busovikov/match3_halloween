@@ -6,10 +6,16 @@ using UnityEngine.UI;
 
 public class ScoreManager : MonoBehaviour
 {
-    static readonly string ScoreTotalString = "Score.Total";
-    static readonly string ScoreBestString = "Score.Best";
+    private static readonly string ScoreTotalString = "Score.Total";
+    private static readonly string ScoreBestString = "Score.Best";
+    private static readonly string TriggerName = "Combo";
+
+    //private string[20] bo
+
     public GameObject comboBonus;
-    public Text scoreUI;
+    private Text comboBonusVal;
+    private Animator comboBonusAnimator;
+    public ScoreUI scoreUI;
 
     [HideInInspector]
     public int current = 0;
@@ -20,6 +26,9 @@ public class ScoreManager : MonoBehaviour
 
     void Awake()
     {
+        comboBonusVal = comboBonus.transform.Find("Val").GetComponent<Text>();
+        comboBonusAnimator = comboBonus.GetComponent<Animator>();
+
         if (PlayerPrefs.HasKey(ScoreTotalString))
         {
             best = PlayerPrefs.GetInt(ScoreBestString);
@@ -41,12 +50,12 @@ public class ScoreManager : MonoBehaviour
         if (val > 0 )
         {
             current += val;
-            scoreUI.GetComponent<ScoreUI>().Set(current);
         }
     }
 
     public void SetTotalScore()
     {
+        scoreUI.Set(current);
         if (best < current)
         {
             best = current;
@@ -56,19 +65,12 @@ public class ScoreManager : MonoBehaviour
         PlayerPrefs.SetInt(ScoreTotalString, total);
     }
 
-    // Update is called once per frame
-    private void Update()
-    {
-    }
-
     internal void AddCombo(int count)
     {
         if (count > 0)
         {
-            var newbonus = Instantiate(comboBonus, comboBonus.transform.parent);
-            newbonus.GetComponent<Text>().text = "Combo! +" + (++count).ToString();
-            newbonus.GetComponent<Animator>().SetTrigger("Bonus");
-            Destroy(newbonus, 1.1f);
+            comboBonusVal.text = (++count * 10).ToString();
+            comboBonusAnimator.SetTrigger(TriggerName);
         }
     }
 }

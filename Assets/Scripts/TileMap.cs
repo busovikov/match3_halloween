@@ -96,22 +96,28 @@ public class TileMap : MonoBehaviour
 
     internal void SpawnDead(int tileType, Transform transform)
     {
-        var dead = Instantiate(DeadTilePool[tileType], transform.position, Quaternion.identity, transform);
+        ObjectPool.DeadObject dead = ObjectPool.Instance.GetDead(tileType);
+        if (dead.obj == null)
+        {
+            return;//Instantiate(DeadTilePool[tileType], transform.position, Quaternion.identity, transform);
+        }
+
+        dead.obj.transform.position = transform.position;
+        dead.obj.SetActive(true);
         if (tileType != goalType)
         {
             var x = UnityEngine.Random.Range(-1f, 1f);
             var y = UnityEngine.Random.Range(0.1f, 1f);
-            dead.GetComponent<Rigidbody2D>().AddForce(new Vector2(x, y) * 5, ForceMode2D.Impulse);
-            dead.GetComponent<Animator>().SetTrigger("Dead");
-            Destroy(dead, 1.1f);
+            dead.body.AddForce(new Vector2(x, y) * 5, ForceMode2D.Impulse);
+            //dead.anim.SetTrigger("Dead");
         }
         else
         {
-            
             var toGoal =  goal.transform.position - transform.position;
-            dead.GetComponent<Animator>().SetTrigger("Dead");
-            dead.GetComponent<Rigidbody2D>().gravityScale = 0;
-            dead.GetComponent<Rigidbody2D>().AddForce (toGoal * 2.5f, ForceMode2D.Impulse );
+            dead.anim.SetTrigger("Dead");
+            dead.body.gravityScale = 0;
+            dead.body.AddForce (toGoal * 2.5f, ForceMode2D.Impulse );
         }
+        
     }
 }

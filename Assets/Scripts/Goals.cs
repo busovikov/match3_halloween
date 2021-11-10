@@ -61,7 +61,7 @@ public class Goals : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         animator.SetTrigger("Add");
-        Destroy(collision.gameObject);
+        collision.gameObject.SetActive(false);
         goal--;
         if (goal > 0)
         {

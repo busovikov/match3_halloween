@@ -9,8 +9,6 @@ public class TileMap : MonoBehaviour
     public int height;
     public GameObject goal;
     public GameObject prefab;
-    public GameObject[] TilePool;
-    public GameObject[] DeadTilePool;
 
     private Tile[,] tiles;
     private int goalType;
@@ -18,31 +16,29 @@ public class TileMap : MonoBehaviour
     //private GameObject[,] DeadPool;
     void Awake()
     {
-        tiles = new Tile[width, height];
-
-        //DeadPool = new GameObject[TilePool.Length, (int)(width * height / 2)];
-
-        List<int> types = Enumerable.Range(0, TilePool.Length).Select((index) => index).ToList();
-        for (int i = 0; i < width; i++)
-            for (int j = 0; j < height; j++)
-            {
-                var position = new Vector3(i, j, 0) + transform.position;
-                Tile tile = GameObject.Instantiate(prefab, position, Quaternion.identity, transform).GetComponent<Tile>();
-                tile.name = i.ToString() + "," + j.ToString();
-                tiles[i, j] = tile;
-                InitContent(i, j, types);
-            }
+        
     }
 
     private void Start()
     {
         goalType = goal.GetComponent<Goals>().type;
+        tiles = new Tile[width, height];
+
+        List<int> types = Enumerable.Range(0, ObjectPool.Instance.alive.sprites.Length).Select((index) => index).ToList();
+        for (int i = 0; i < width; i++)
+            for (int j = 0; j < height; j++)
+            {
+                var position = new Vector3(i, j, 0) + transform.position;
+                Tile tile = GameObject.Instantiate(prefab, position, Quaternion.identity, transform).GetComponent<Tile>();
+                tiles[i, j] = tile;
+                InitContent(i, j, types);
+            }
     }
 
     public Coroutine Create(Vector2 position, Vector2 offset, bool dropped = false)
     {
-        var index = UnityEngine.Random.Range(0, TilePool.Length);
-        return GetTile(position).CreateContent(TilePool[index], index, dropped, offset);
+        var index = UnityEngine.Random.Range(0, ObjectPool.Instance.alive.sprites.Length);
+        return GetTile(position).CreateContent(index, dropped, offset);
     }
     private void InitContent(int x, int y, List<int> types)
     {
@@ -61,7 +57,7 @@ public class TileMap : MonoBehaviour
 
         var index = allowedTypes[UnityEngine.Random.Range(0, allowedTypes.Count)];
         const bool dropped = false;
-        GetTile(position).CreateContent(TilePool[index], index, dropped);
+        GetTile(position).CreateContent( index, dropped);
     }
 
     public Tile GetTile(Vector2 position)
@@ -96,27 +92,25 @@ public class TileMap : MonoBehaviour
 
     internal void SpawnDead(int tileType, Transform transform)
     {
-        ObjectPool.DeadObject dead = ObjectPool.Instance.GetDead(tileType);
-        if (dead.obj == null)
-        {
-            return;//Instantiate(DeadTilePool[tileType], transform.position, Quaternion.identity, transform);
-        }
+        ObjectPool.PooledObject dead = ObjectPool.Instance.GetDead(tileType);
 
         dead.obj.transform.position = transform.position;
         dead.obj.SetActive(true);
+        
         if (tileType != goalType)
         {
             var x = UnityEngine.Random.Range(-1f, 1f);
             var y = UnityEngine.Random.Range(0.1f, 1f);
-            dead.body.AddForce(new Vector2(x, y) * 5, ForceMode2D.Impulse);
-            //dead.anim.SetTrigger("Dead");
+            dead.body.gravityScale = 1;
+            dead.body.velocity = new Vector2(x, y) * 5; //, ForceMode2D.Impulse);
+            dead.anim.SetTrigger("Dead");
         }
         else
         {
             var toGoal =  goal.transform.position - transform.position;
             dead.anim.SetTrigger("Dead");
             dead.body.gravityScale = 0;
-            dead.body.AddForce (toGoal * 2.5f, ForceMode2D.Impulse );
+            dead.body.velocity = toGoal * 2.5f; //, ForceMode2D.Impulse );
         }
         
     }

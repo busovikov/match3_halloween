@@ -38,7 +38,7 @@ public class Boosters : MonoBehaviour
 
         private string Name()
         {
-            string s = stringBuilder.AppendFormat("Booster.{0}", amount).ToString();
+            string s = stringBuilder.AppendFormat("Booster.{0}", type).ToString();
             stringBuilder.Clear();
             return s;
         }
@@ -54,37 +54,37 @@ public class Boosters : MonoBehaviour
             {
                 amount = PlayerPrefs.GetInt(Name());
             }
+            UpdateLable();
         }
 
         public void Fill(Transform child, ActivateBoosterCallback cb)
         {
             btn = child.GetComponent<Button>();
+            label = btn.transform.GetChild(0).GetComponent<Text>();
             animation = child.GetComponent<Animator>();
             activate = cb;
             btn.onClick.AddListener(delegate (){
                 if (amount > 0)
                 {
                     timer = cooldown;
+                    btn.interactable = false;
                     Dec();
                     activate(type);
                 }
             });
-            label = btn.transform.GetChild(0).GetComponent<Text>();
+            timer = 0.1f;
         }
 
         public void Update()
         {
-            if (timer <= 0)
+            if(timer > 0)
             {
-                btn.interactable = amount > 0;
-            }
-            else
-            {
-                btn.interactable = false;
                 timer -= Time.deltaTime;
+                if(timer <= 0)
+                {
+                    btn.interactable = amount > 0;
+                }
             }
-
-            
         }
 
         private void UpdateLable()
@@ -92,7 +92,6 @@ public class Boosters : MonoBehaviour
             if (label != null)
             {
                 label.text = amount.ToString();
-
             }
         }
 
@@ -159,8 +158,8 @@ public class Boosters : MonoBehaviour
         int size = Mathf.Min(transform.childCount, boosters.Length);
         for (int i = 0; i < size; i++)
         {
-            boosters[i].Load();
             boosters[i].Fill(transform.GetChild(i), cb);
+            boosters[i].Load();
             lookupTable[boosters[i].type] = i;
         }
     }

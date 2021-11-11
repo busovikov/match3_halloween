@@ -84,7 +84,8 @@ public class Tile : MonoBehaviour
     {
         //StopCoroutine(SwapAnimation());
         tileType = 0;
-        Destroy(content);
+        content.SetActive(false);
+        content.transform.SetParent(null);
         content = null;
     }
 
@@ -105,10 +106,14 @@ public class Tile : MonoBehaviour
         }
         return null;
     }
-    public Coroutine CreateContent( GameObject prefab, int index, bool dropped, Vector3 offset = default)
+    public Coroutine CreateContent(int type, bool dropped, Vector3 offset = default)
     {
-        content = Instantiate(prefab, container.transform.position + offset, Quaternion.identity, container.transform);
-        tileType = index;
+        //content = Instantiate(prefab, container.transform.position + offset, Quaternion.identity, container.transform);
+        ObjectPool.PooledObject pooledObj = ObjectPool.Instance.GetAlive(type);
+        pooledObj.obj.transform.position = container.transform.position + offset;
+        content = pooledObj.obj;
+        content.transform.SetParent(container.transform);
+        tileType = type;
         
         if (dropped)
         {

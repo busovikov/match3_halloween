@@ -96,6 +96,10 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                     uiManager.ShowNoMatches();
                     StartCoroutine(Shuffeling());
                 }
+                else
+                {
+                    System.GC.Collect();
+                }
             }
 
             if (toSwap != null)

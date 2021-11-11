@@ -6,23 +6,61 @@ public class ObjectPool : MonoBehaviour
 {
     [HideInInspector]
     public static ObjectPool Instance;
+    
+    private int deadIndex = 0;
+    private int aliveIndex = 0;
 
-    private static readonly int amount = 10;
-    private List<DeadObject>[] DeadPool;
-    private List<GameObject>[] AlivePool;
-
-    private int[] deadIndex;
-    private int[] aliveIndex;
-
-    public struct DeadObject
+    public struct PooledObject
     {
         public GameObject obj;
+        public SpriteRenderer spriteRenderer;
         public Rigidbody2D body;
         public Animator anim;
     }
 
-    public  GameObject[] deadTilePrefabs;
-    public  GameObject[] tilePrefabs;
+    public interface IPooled
+    {
+        IList<PooledObject> Pool { get; }
+        GameObject Prefab { get; }
+        int Index { set; get; }
+        int Amount { get; }
+        Sprite GetSprite(int i);
+
+        void Init();
+    }
+
+    [System.Serializable]
+    public class Pooled : IPooled
+    {
+        private List<PooledObject> pool;
+        public int amount = 10;
+
+        [SerializeField]
+        public int Amount { get => amount; }
+        public Sprite[] sprites;
+        public GameObject prefab;
+        public int Index { set; get; }
+
+        public IList<PooledObject> Pool => pool;
+
+        public GameObject Prefab => prefab;
+
+        public Sprite GetSprite(int i)
+        {
+            if (i < 0 || i >= sprites.Length)
+                return null;
+            return sprites[i];
+        }
+
+        public void Init()
+        {
+            pool = new List<PooledObject>(amount);
+        }
+    }
+
+    public Pooled dead;
+    public Pooled alive;
+
     void Awake()
     {
         Instance = FindObjectOfType<ObjectPool>();
@@ -37,70 +75,73 @@ public class ObjectPool : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
-        DeadPool = new List<DeadObject>[deadTilePrefabs.Length];
-        AlivePool = new List<GameObject>[tilePrefabs.Length];
-        deadIndex = new int[deadTilePrefabs.Length];
-        aliveIndex = new int[tilePrefabs.Length];
+        InitPool(dead);
+    }
 
-        for (int i = 0; i < DeadPool.Length; i++)
+    PooledObject MakePooled(GameObject prefab)
+    {
+        PooledObject pooledObject;
+        pooledObject.obj = Instantiate(prefab);
+        pooledObject.body = pooledObject.obj.GetComponent<Rigidbody2D>();
+        pooledObject.anim = pooledObject.obj.GetComponent<Animator>();
+        pooledObject.spriteRenderer = pooledObject.obj.GetComponent<SpriteRenderer>();
+        pooledObject.obj.SetActive(false);
+        return pooledObject;
+    }
+    void InitPool<T>(T pooled) where T : IPooled
+    {
+        pooled.Init();
+        for (int i = 0; i < pooled.Amount; i++)
         {
-            DeadPool[i] = new List<DeadObject>(amount);
-            for (int j = 0; j < amount; j++)
-            {
-                DeadObject dead;
-                dead.obj = Instantiate(deadTilePrefabs[i]);
-                dead.body = dead.obj.GetComponent<Rigidbody2D>();
-                dead.anim = dead.obj.GetComponent<Animator>();
-                dead.obj.SetActive(false);
-                DeadPool[i].Add(dead);
-            }
-        }
-        for (int i = 0; i < AlivePool.Length; i++)
-        {
-            AlivePool[i] = new List<GameObject>(amount);
-            for (int j = 0; j < AlivePool.Length; j++)
-            {
-                GameObject o = Instantiate(tilePrefabs[i]);
-                o.SetActive(false);
-                AlivePool[i].Add(o);
-            }
+            pooled.Pool.Add(MakePooled(pooled.Prefab));
         }
     }
 
-    public DeadObject GetDead(int type)
+    int AddToPool<T>(int amount, T pooled) where T : IPooled
     {
-        if (type < 0 && type > deadTilePrefabs.Length)
-            return default(DeadObject);
-
         for (int i = 0; i < amount; i++)
         {
-            int index = (amount + deadIndex[type]++) % amount;
-            if (DeadPool[type][index].obj.activeInHierarchy == false)
+            pooled.Pool.Add(MakePooled(pooled.Prefab));
+        }
+        return pooled.Pool.Count - amount;
+    }
+    
+    PooledObject Get<T>(T pooled) where T : IPooled
+    {
+        if (pooled.Pool == null)
+        {
+            InitPool(pooled);
+        }
+        int amount = pooled.Pool.Count;
+        int offset = pooled.Index++;
+        for (int i = 0; i < amount; i++)
+        {
+            int index = (i + offset) % amount;
+            if (pooled.Pool[index].obj.activeInHierarchy == false)
             {
-                return DeadPool[type][index];
+                return pooled.Pool[index];
             }
         }
-
-        return default(DeadObject);
+        pooled.Index = AddToPool(3,pooled);
+        return pooled.Pool[pooled.Index];
     }
 
-    public GameObject GetAlive(int type)
+    public PooledObject GetDead(int type)
     {
-        if (type < 0 && type > tilePrefabs.Length)
-            return null;
+        PooledObject o = Get(dead);
+        o.spriteRenderer.sprite = dead.GetSprite(type);
+        o.obj.SetActive(true);
+        return o;
+    }
 
-        for (int i = 0; i < amount; i++)
-        {
-            int index = (amount + aliveIndex[type]++) % amount;
-            if (AlivePool[type][index].activeInHierarchy == false)
-            {
-                return AlivePool[type][index];
-            }
-        }
-
-        return null;
+    public PooledObject GetAlive(int type)
+    {
+        PooledObject o = Get(alive);
+        o.spriteRenderer.sprite = alive.GetSprite(type);
+        o.obj.SetActive(true);
+        o.obj.transform.localScale = Vector3.one * .9f;
+        return o;
     }
 }

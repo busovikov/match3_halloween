@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/work_ps.unity
     guid: 3ba17a5b54d86d347b0c638358c860e6
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 27a01698e56e4794bbab8014317d7d20, type: 2}
+    com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: 2a01f215578ed5440ab957006f39b8ba, type: 2}
+    com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 627d0b5985be8dc4fa535ba4ad19e105, type: 2}

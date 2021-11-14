@@ -45,15 +45,12 @@ public class Boosters : MonoBehaviour
 
         public void Save()
         {
-            PlayerPrefs.SetInt(Name(), amount);
+            Config.SaveInt(Name(), amount);
         }
 
         public void Load()
         {
-            if (PlayerPrefs.HasKey(Name()))
-            {
-                amount = PlayerPrefs.GetInt(Name());
-            }
+            Config.LoadInt(Name(), out amount, amount);
             UpdateLable();
         }
 

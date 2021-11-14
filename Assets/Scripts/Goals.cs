@@ -33,21 +33,15 @@ public class Goals : MonoBehaviour
         gameMode = gm;
         if (gm == LevelLoader.GameMode.Time)
         {
-            if (PlayerPrefs.HasKey(goalTimeString))
-            {
-                goal = PlayerPrefs.GetInt(goalTimeString);
-            }
+            Config.LoadInt(goalTimeString, out goal, goal);
             moves = (goal / 3) * 5;
         }
         else
         {
-            if (PlayerPrefs.HasKey(goalMovesString))
-            {
-                goal = PlayerPrefs.GetInt(goalMovesString);
-            }
+            Config.LoadInt(goalMovesString, out goal, goal);
             moves = (goal / 3) * 2;
         }
-        next = goal + 6;
+        next = goal + 3;
         label.text = goal.ToString();
         return moves;
     }
@@ -72,11 +66,11 @@ public class Goals : MonoBehaviour
             label.text = 0.ToString();
             if (gameMode == LevelLoader.GameMode.Time)
             {
-                PlayerPrefs.SetInt(goalTimeString, next);
+                Config.SaveInt(goalTimeString, next);
             }
             else
             {
-                PlayerPrefs.SetInt(goalMovesString, next);
+                Config.SaveInt(goalMovesString, next);
             }
             reached = true;
         }

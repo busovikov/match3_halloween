@@ -39,13 +39,10 @@ public class SoundManager : MonoBehaviour
 
     void InitSoundSources()
     {
-        if (PlayerPrefs.HasKey("volume"))
-        {
-            volume = PlayerPrefs.GetFloat("volume");
-            volumeMusic = PlayerPrefs.GetFloat("volumeMusic");
-            mute = Convert.ToBoolean(PlayerPrefs.GetInt("Mute"));
-        }
-
+        Config.LoadBool("Mute", out mute, mute);
+        Config.LoadFloat("volume", out volume, volume);
+        Config.LoadFloat("volumeMusic", out volumeMusic, volumeMusic);
+        
         if(volumeSlider != null)
             volumeSlider.GetComponent<Slider>().SetValueWithoutNotify(volume);
         if(musicButton != null)
@@ -80,8 +77,8 @@ public class SoundManager : MonoBehaviour
             ThemeSource.volume = volumeMusic;
             
         }
-        PlayerPrefs.SetFloat("volumeMusic", volumeMusic);
-        PlayerPrefs.SetInt("Mute", Convert.ToInt32(mute));
+        Config.SaveFloat("volumeMusic", volumeMusic);
+        Config.SaveBool("Mute",mute);
     }
 
     public void OnVolumeChanged()
@@ -92,11 +89,11 @@ public class SoundManager : MonoBehaviour
         {
             volumeMusic = volume;
             ThemeSource.volume = volume;
-            PlayerPrefs.SetFloat("volumeMusic", volume);
+            Config.SaveFloat("volumeMusic", volume);
         }
         popSoundSource.volume = volume;
         popupDropSoundSource.volume = volume;
-        PlayerPrefs.SetFloat("volume", volume);
+        Config.SaveFloat("volume", volume);
         ShowVolumeSlider();
     }
 

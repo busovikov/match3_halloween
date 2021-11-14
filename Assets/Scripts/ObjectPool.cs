@@ -6,10 +6,6 @@ public class ObjectPool : MonoBehaviour
 {
     [HideInInspector]
     public static ObjectPool Instance;
-    
-    private int deadIndex = 0;
-    private int aliveIndex = 0;
-
     public struct PooledObject
     {
         public GameObject obj;

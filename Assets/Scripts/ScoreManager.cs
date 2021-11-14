@@ -10,8 +10,6 @@ public class ScoreManager : MonoBehaviour
     private static readonly string ScoreBestString = "Score.Best";
     private static readonly string TriggerName = "Combo";
 
-    //private string[20] bo
-
     public GameObject comboBonus;
     private Text comboBonusVal;
     private Animator comboBonusAnimator;
@@ -29,11 +27,8 @@ public class ScoreManager : MonoBehaviour
         comboBonusVal = comboBonus.transform.Find("Val").GetComponent<Text>();
         comboBonusAnimator = comboBonus.GetComponent<Animator>();
 
-        if (PlayerPrefs.HasKey(ScoreTotalString))
-        {
-            best = PlayerPrefs.GetInt(ScoreBestString);
-            total = PlayerPrefs.GetInt(ScoreTotalString);
-        }
+        Config.LoadInt(ScoreBestString, out best, best);
+        Config.LoadInt(ScoreTotalString, out total, total);
     }
 
     public void SubTotalScore(int val)
@@ -41,7 +36,7 @@ public class ScoreManager : MonoBehaviour
         if (val > 0 && total >= val)
         {
             total -= val;
-            PlayerPrefs.SetInt(ScoreTotalString, total);
+            Config.SaveInt(ScoreTotalString, total);
         }
     }
 
@@ -50,19 +45,19 @@ public class ScoreManager : MonoBehaviour
         if (val > 0 )
         {
             current += val;
+            scoreUI.Set(current);
         }
     }
 
     public void SetTotalScore()
     {
-        scoreUI.Set(current);
         if (best < current)
         {
             best = current;
-            PlayerPrefs.SetInt(ScoreBestString, total);
+            Config.SaveInt(ScoreBestString, total);
         }
         total += current;
-        PlayerPrefs.SetInt(ScoreTotalString, total);
+        Config.SaveInt(ScoreTotalString, total);
     }
 
     internal void AddCombo(int count)

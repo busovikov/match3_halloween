@@ -75,11 +75,21 @@ public class Tile : MonoBehaviour
 
         if (dropped)
         {
-            animator.SetTrigger("Dropped");
             invalid = false;
+            StartCoroutine(DropAnimation());
         }
         
     }
+
+    private IEnumerator DropAnimation()
+    {
+        animator.enabled = true;
+        animator.SetTrigger("Dropped");
+        yield return new WaitForSeconds(1);
+        animator.enabled = false;
+        transform.localScale = Vector3.one;
+    }
+
     public void DestroyContent()
     {
         //StopCoroutine(SwapAnimation());

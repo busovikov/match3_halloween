@@ -76,18 +76,17 @@ public class Tile : MonoBehaviour
         if (dropped)
         {
             invalid = false;
-            StartCoroutine(DropAnimation());
+            animator.enabled = true;
+            content.transform.localPosition = Vector3.zero;
+            content.transform.localScale = Vector3.one * 0.9f;
+            animator.SetTrigger("Dropped");
         }
         
     }
 
-    private IEnumerator DropAnimation()
+    public void OnDropAnimationEnded()
     {
-        animator.enabled = true;
-        animator.SetTrigger("Dropped");
-        yield return new WaitForSeconds(1);
         animator.enabled = false;
-        transform.localScale = Vector3.one;
     }
 
     public void DestroyContent()

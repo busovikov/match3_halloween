@@ -11,8 +11,11 @@ public class LevelManager : MonoBehaviour
     private static readonly string LevelTimesString = "Level.Times";
     private static readonly string MovesString = "Moves";
     private static readonly string TimeString = "Time";
+    private static readonly string BonusMovesString = "More moves  +";
+    private static readonly string BonusTimeString = "More time  +";
 
     private Text bonusVal;
+    private Text bonusHeader;
     private Animator bonusAnimator;
     public ScoreUI stringValue;
     public ScoreUI stringLevel;
@@ -32,6 +35,7 @@ public class LevelManager : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
+        bonusHeader = bonus.transform.Find("Header").GetComponent<Text>();
         bonusVal = bonus.transform.Find("Val").GetComponent<Text>();
         bonusAnimator = bonus.GetComponent<Animator>();
         level = 1;
@@ -89,6 +93,7 @@ public class LevelManager : MonoBehaviour
     {
         SetValue(val);
         label.text = MovesString;
+        bonusHeader.text = BonusMovesString;
     }
 
     private void SetValue(int val)
@@ -101,6 +106,7 @@ public class LevelManager : MonoBehaviour
     {
         SetValue(seconds);
         label.text = TimeString;
+        bonusHeader.text = BonusTimeString;
         running = true;
     }
 

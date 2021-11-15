@@ -26,7 +26,9 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private bool dirty = false;
     private bool checkAvailableNextFrame = false;
     private bool actionAllowed = true;
-    private bool rowDestoy = false;
+    private Boosters.Booster rowDestoy = null;
+
+    public Animator highlighter;
 
     private struct ToSwap
     {
@@ -42,7 +44,7 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     {
         toSwap = new ToSwap();
         boosters = FindObjectOfType<Boosters>();
-        boosters.InitBoosters(ActivateBooster);
+        boosters.InitBoosters(ActivateBooster, ReleaseBooster);
         uiManager = FindObjectOfType<UIManager>();
         soundManager = FindObjectOfType<SoundManager>();
         tileMap = GetComponent<TileMap>();
@@ -167,18 +169,32 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
             }
         }
     }
-    public void ActivateBooster(Boosters.BoosterType booster)
+
+    private void ReleaseBooster(Boosters.Booster booster)
     {
-        if (booster == Boosters.BoosterType.Mix)
+        if (booster.type == Boosters.BoosterType.Erase && rowDestoy != null)
         {
+            highlighter.SetTrigger("Off");
+            rowDestoy = null;
+        }
+    }
+
+    public void ActivateBooster(Boosters.Booster booster)
+    {
+        if (booster.type == Boosters.BoosterType.Mix)
+        {
+            booster--;
             StartCoroutine(Shuffeling(true)); // true - Once
         }
-        else if (booster == Boosters.BoosterType.Erase)
+        else if (booster.type == Boosters.BoosterType.Erase)
         {
-            rowDestoy = true;
+            highlighter.enabled = true;
+            highlighter.SetTrigger("On");
+            rowDestoy = booster;
         }
-        else if (booster == Boosters.BoosterType.Add)
+        else if (booster.type == Boosters.BoosterType.Add)
         {
+            booster--;
             if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
             {
                 levelManager.AddMoves(2);
@@ -198,17 +214,20 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         toSwap.second = second;
         tileMap.GetTile(first).ExchangeWith(tileMap.GetTile(second), () => { toSwap.swapped = true; dirty = true; });
     }
+
     private void SetPosition(Vector2 position)
     {
         Vector2 offsetPosition = ToField(position - (Vector2)colliderCache.transform.position);
         if (actionAllowed && firstPosition != offsetPosition)
         {
-            if (rowDestoy)
+            if (rowDestoy!=null)
             {
+                highlighter.SetTrigger("Off");
                 actionAllowed = false;
                 HideSelection();
                 DestroyRow(offsetPosition);
-                rowDestoy = false;
+                rowDestoy--;
+                rowDestoy = null;
             }
             else if (firstPosition != invalidPosition && IsNeighbours(firstPosition, offsetPosition))
             {

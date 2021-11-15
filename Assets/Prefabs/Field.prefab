@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selection: {fileID: 7596309805812281159, guid: 8e76ad3f4dac3e346abc9b88f4a9677c, type: 3}
+  colliderCache: {fileID: 0}
 --- !u!114 &5904029405156730331
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -60,19 +61,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 8
   height: 8
+  goal: {fileID: 0}
   prefab: {fileID: 4612849928330980996, guid: 68327ec6764c8f04da004d4324f9d13e, type: 3}
-  TilePool:
-  - {fileID: 2438445952447163677, guid: 0df0a4ec8891b694d8301b1c0a76bbee, type: 3}
-  - {fileID: 6475934384082794099, guid: a026295ab2e131a4bb9e6136ff2a9e96, type: 3}
-  - {fileID: 8142070677606287751, guid: af36346a375ddba42aa3c2adbcc250e3, type: 3}
-  - {fileID: 2347863074050918069, guid: 10468f264e6a46048b2b91f1d96b71c0, type: 3}
-  - {fileID: 7095409677720501727, guid: 4459b02ecfe2c9f4cabf4743428cb59e, type: 3}
-  DeadTilePool:
-  - {fileID: 797616172108591172, guid: 8b990439546b3354eb2c43834030c8bd, type: 3}
-  - {fileID: 7279234765017676879, guid: 301e792822e54af44abca37543193e9a, type: 3}
-  - {fileID: 6021989490703758139, guid: 775dc2e9d7a191342b0b711b322a22b5, type: 3}
-  - {fileID: 8942069327459920238, guid: f500c922c8217804ba5dc99ab7fc0e89, type: 3}
-  - {fileID: 6807006293021911600, guid: e8391ad39abc40b4297770fffe4b81a9, type: 3}
 --- !u!61 &5904029405156730330
 BoxCollider2D:
   m_ObjectHideFlags: 0

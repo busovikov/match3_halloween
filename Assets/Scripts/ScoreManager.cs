@@ -7,7 +7,8 @@ using UnityEngine.UI;
 public class ScoreManager : MonoBehaviour
 {
     private static readonly string ScoreTotalString = "Score.Total";
-    private static readonly string ScoreBestString = "Score.Best";
+    private static readonly string ScoreBestTimeString = "Score.Best.Time";
+    private static readonly string ScoreBestMovesString = "Score.Best.Moves";
     private static readonly string TriggerName = "Combo";
 
     public GameObject comboBonus;
@@ -18,7 +19,9 @@ public class ScoreManager : MonoBehaviour
     [HideInInspector]
     public int current = 0;
     [HideInInspector]
-    public int best = 0;
+    public int bestTime = 0;
+    [HideInInspector]
+    public int bestMoves = 0;
     [HideInInspector]
     public int total = 0;
 
@@ -27,7 +30,8 @@ public class ScoreManager : MonoBehaviour
         comboBonusVal = comboBonus.transform.Find("Val").GetComponent<Text>();
         comboBonusAnimator = comboBonus.GetComponent<Animator>();
 
-        Config.LoadInt(ScoreBestString, out best, best);
+        Config.LoadInt(ScoreBestTimeString, out bestTime, bestTime);
+        Config.LoadInt(ScoreBestMovesString, out bestMoves, bestMoves);
         Config.LoadInt(ScoreTotalString, out total, total);
     }
 
@@ -49,12 +53,28 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
+    public int GetBest()
+    { 
+        return LevelLoader.Instance.mode == LevelLoader.GameMode.Moves ? bestMoves : bestTime;
+    }
+
+    void SetBest(int val)
+    {
+        if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
+        {
+            bestMoves = val;
+        }
+        else
+        {
+            bestTime = val;
+        }
+    }
     public void SetTotalScore()
     {
-        if (best < current)
+        if (GetBest() < current)
         {
-            best = current;
-            Config.SaveInt(ScoreBestString, total);
+            SetBest(current);
+            Config.SaveInt(LevelLoader.Instance.mode == LevelLoader.GameMode.Moves ? ScoreBestMovesString : ScoreBestTimeString, current);
         }
         total += current;
         Config.SaveInt(ScoreTotalString, total);

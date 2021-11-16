@@ -55,7 +55,7 @@ public class EndLevel : MonoBehaviour
     private void OnEnable()
     {
         scoreLabel.GetComponent<ScoreUI>().Set(score.current);
-        bestScoreLabel.GetComponent<ScoreUI>().Set(score.best);
+        bestScoreLabel.GetComponent<ScoreUI>().Set(score.GetBest());
         totalScoreLabel.GetComponent<ScoreUI>().Set(score.total);
     }
 

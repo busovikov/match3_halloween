@@ -7,10 +7,9 @@ using UnityEngine.UI;
 public class ScoreManager : MonoBehaviour
 {
     private static readonly string ScoreTotalString = "Score.Total";
-    private static readonly string ScoreBestString = "Score.Best";
+    private static readonly string ScoreBestTimeString = "Score.Best.Time";
+    private static readonly string ScoreBestMovesString = "Score.Best.Moves";
     private static readonly string TriggerName = "Combo";
-
-    //private string[20] bo
 
     public GameObject comboBonus;
     private Text comboBonusVal;
@@ -20,7 +19,9 @@ public class ScoreManager : MonoBehaviour
     [HideInInspector]
     public int current = 0;
     [HideInInspector]
-    public int best = 0;
+    public int bestTime = 0;
+    [HideInInspector]
+    public int bestMoves = 0;
     [HideInInspector]
     public int total = 0;
 
@@ -29,11 +30,9 @@ public class ScoreManager : MonoBehaviour
         comboBonusVal = comboBonus.transform.Find("Val").GetComponent<Text>();
         comboBonusAnimator = comboBonus.GetComponent<Animator>();
 
-        if (PlayerPrefs.HasKey(ScoreTotalString))
-        {
-            best = PlayerPrefs.GetInt(ScoreBestString);
-            total = PlayerPrefs.GetInt(ScoreTotalString);
-        }
+        Config.LoadInt(ScoreBestTimeString, out bestTime, bestTime);
+        Config.LoadInt(ScoreBestMovesString, out bestMoves, bestMoves);
+        Config.LoadInt(ScoreTotalString, out total, total);
     }
 
     public void SubTotalScore(int val)
@@ -41,7 +40,7 @@ public class ScoreManager : MonoBehaviour
         if (val > 0 && total >= val)
         {
             total -= val;
-            PlayerPrefs.SetInt(ScoreTotalString, total);
+            Config.SaveInt(ScoreTotalString, total);
         }
     }
 
@@ -50,19 +49,35 @@ public class ScoreManager : MonoBehaviour
         if (val > 0 )
         {
             current += val;
+            scoreUI.Set(current);
         }
     }
 
+    public int GetBest()
+    { 
+        return LevelLoader.Instance.mode == LevelLoader.GameMode.Moves ? bestMoves : bestTime;
+    }
+
+    void SetBest(int val)
+    {
+        if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
+        {
+            bestMoves = val;
+        }
+        else
+        {
+            bestTime = val;
+        }
+    }
     public void SetTotalScore()
     {
-        scoreUI.Set(current);
-        if (best < current)
+        if (GetBest() < current)
         {
-            best = current;
-            PlayerPrefs.SetInt(ScoreBestString, total);
+            SetBest(current);
+            Config.SaveInt(LevelLoader.Instance.mode == LevelLoader.GameMode.Moves ? ScoreBestMovesString : ScoreBestTimeString, current);
         }
         total += current;
-        PlayerPrefs.SetInt(ScoreTotalString, total);
+        Config.SaveInt(ScoreTotalString, total);
     }
 
     internal void AddCombo(int count)

@@ -8,7 +8,8 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 {
     public GameObject selection;
 
-    private new BoxCollider2D collider;
+    [HideInInspector]
+    public BoxCollider2D colliderCache;
     private static Vector2 invalidPosition = Vector2.left;
     private Vector2 firstPosition = invalidPosition;
 
@@ -17,22 +18,21 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     private Match match;
     private UIManager uiManager;
     private ScoreManager score;
-    private TimeAndMoves timeAndMoves;
+    private LevelManager levelManager;
     private SoundManager soundManager;
     private Boosters boosters;
     private int comboCount = -1;
     private int processing = 0;
     private bool dirty = false;
+    private bool checkAvailableNextFrame = false;
     private bool actionAllowed = true;
-    private bool rowDestoy = false;
+    private Boosters.Booster rowDestoy = null;
 
-    private class ToSwap
+    public Animator highlighter;
+
+    private struct ToSwap
     {
-        public ToSwap(Vector2 f, Vector2 s) 
-        {
-            first = f;
-            second = s;
-        }
+        public bool swapped;
         public Vector2 first;
         public Vector2 second;
     }
@@ -42,8 +42,9 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     // Start is called before the first frame update
     void Awake()
     {
+        toSwap = new ToSwap();
         boosters = FindObjectOfType<Boosters>();
-        boosters.InitBoosters(ActivateBooster);
+        boosters.InitBoosters(ActivateBooster, ReleaseBooster);
         uiManager = FindObjectOfType<UIManager>();
         soundManager = FindObjectOfType<SoundManager>();
         tileMap = GetComponent<TileMap>();
@@ -51,33 +52,38 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         match = new Match(tileMap);
 
         score = FindObjectOfType<ScoreManager>();
-        timeAndMoves = FindObjectOfType<TimeAndMoves>();
+        levelManager = FindObjectOfType<LevelManager>();
 
-        collider = GetComponent<BoxCollider2D>();
-        collider.size = new Vector2(tileMap.width, tileMap.height);
-        collider.offset = collider.size / 2 - Vector2.one / 2;
+        colliderCache = GetComponent<BoxCollider2D>();
+        colliderCache.size = new Vector2(tileMap.width, tileMap.height);
+        colliderCache.offset = colliderCache.size / 2 - Vector2.one / 2;
     }
 
     private void Start()
     {
+        Application.targetFrameRate = 60;
         var movesOrTime = goals.GetGoalForGameMode(LevelLoader.Instance.mode);
         if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
         {
-            timeAndMoves.StartAsMoves(LevelLoader.Instance.levelMoves > 0 ? LevelLoader.Instance.levelMoves : movesOrTime);
+            levelManager.StartAsMoves(LevelLoader.Instance.levelMoves > 0 ? LevelLoader.Instance.levelMoves : movesOrTime);
         }
         else
         {
-            timeAndMoves.StartAsSeconds(LevelLoader.Instance.levelTime > 0 ? LevelLoader.Instance.levelTime : movesOrTime);
+            levelManager.StartAsSeconds(LevelLoader.Instance.levelTime > 0 ? LevelLoader.Instance.levelTime : movesOrTime);
         }
     }
 
+    bool Compare(Vector2 v2, Vector3 v3)
+    {
+        return v2.Equals((Vector2)v3);
+    }
     private void Update()
     {
-        
+
         if (dirty)
         {
             dirty = false;
-            HashSet<Vector3> destroy;
+            Match.DestructableTiles destroy;
             if (match.IsAny(out destroy))
             {
                 StartCoroutine(Processing(destroy));
@@ -91,42 +97,59 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
                     comboCount = -1;
                 }
 
-                if (match.SwapsAvailable() == false)
-                {
-                    uiManager.ShowNoMatches();
-                    StartCoroutine(Shuffeling());
-                }
-                else
-                {
-                    System.GC.Collect();
-                }
+                checkAvailableNextFrame = true;
             }
 
-            if (toSwap != null)
+            if (toSwap.swapped)
             {
-                if (destroy != null && (destroy.Contains(toSwap.first) || destroy.Contains(toSwap.second)))
+                bool swapback = true;
+                if (destroy.destructionList != null)
                 {
-                    if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
+                    foreach (Vector3 v in destroy.destructionList)
                     {
-                        timeAndMoves.Sub(1);
+                        if (Compare(toSwap.first, v) || Compare(toSwap.second, v))
+                        {
+                            swapback = false;
+                            break;
+                        }
                     }
                 }
-                else 
+
+                if (swapback)
                 {
                     tileMap.GetTile(toSwap.first).ExchangeWith(tileMap.GetTile(toSwap.second), null);
                 }
-                toSwap = null;
+                else if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
+                {
+                    levelManager.SubMoves(1);
+                }
+
+                toSwap.swapped = false;
             }
         }
-
-        if ((goals.reached || !timeAndMoves.Check() ) && processing == 0)
+        else
         {
-            processing++;
-            if (goals.reached)
-                score.SetTotalScore();
-            else
-                score.current = 0;
-            LevelLoader.EndLevel(goals.reached);
+            if (checkAvailableNextFrame && match.SwapsAvailable() == false)
+            {
+                checkAvailableNextFrame = false;
+                uiManager.ShowNoMatches();
+                StartCoroutine(Shuffeling());
+            }
+
+            if ((goals.reached || !levelManager.Check()) && processing == 0)
+            {
+                processing++;
+                score.AddScore(levelManager.moves * 10 + levelManager.moves);
+                
+                if (goals.reached)
+                {
+                    score.SetTotalScore();
+                    levelManager.NextLevel();
+                }
+                else
+                    score.current = 0;
+                LevelLoader.EndLevel(goals.reached);
+            }
         }
     }
 
@@ -139,32 +162,46 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         }
         else
         {
-            HashSet<Vector3> destroy;
+            Match.DestructableTiles destroy;
             while (match.IsAny(out destroy) || match.SwapsAvailable() == false)
             {
                 yield return Reshuffle();
             }
         }
     }
-    public void ActivateBooster(Boosters.BoosterType booster)
+
+    private void ReleaseBooster(Boosters.Booster booster)
     {
-        if (booster == Boosters.BoosterType.Mix)
+        if (booster.type == Boosters.BoosterType.Erase && rowDestoy != null)
         {
+            highlighter.SetTrigger("Off");
+            rowDestoy = null;
+        }
+    }
+
+    public void ActivateBooster(Boosters.Booster booster)
+    {
+        if (booster.type == Boosters.BoosterType.Mix)
+        {
+            booster--;
             StartCoroutine(Shuffeling(true)); // true - Once
         }
-        else if (booster == Boosters.BoosterType.Erase)
+        else if (booster.type == Boosters.BoosterType.Erase)
         {
-            rowDestoy = true;
+            highlighter.enabled = true;
+            highlighter.SetTrigger("On");
+            rowDestoy = booster;
         }
-        else if (booster == Boosters.BoosterType.Add)
+        else if (booster.type == Boosters.BoosterType.Add)
         {
+            booster--;
             if (LevelLoader.Instance.mode == LevelLoader.GameMode.Moves)
             {
-                timeAndMoves.Add(2);
+                levelManager.AddMoves(2);
             }
             else
             {
-                timeAndMoves.Add(5);
+                levelManager.AddMoves(5);
             }
         }
     }
@@ -173,20 +210,24 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     {
         if (!tileMap.IsValid(first) || !tileMap.IsValid(second))
             return;
-       
-        tileMap.GetTile(first).ExchangeWith(tileMap.GetTile(second), () => { toSwap = new ToSwap(first, second); dirty = true; });
+        toSwap.first = first;
+        toSwap.second = second;
+        tileMap.GetTile(first).ExchangeWith(tileMap.GetTile(second), () => { toSwap.swapped = true; dirty = true; });
     }
+
     private void SetPosition(Vector2 position)
     {
-        Vector2 offsetPosition = ToField(position - (Vector2)collider.transform.position);
+        Vector2 offsetPosition = ToField(position - (Vector2)colliderCache.transform.position);
         if (actionAllowed && firstPosition != offsetPosition)
         {
-            if (rowDestoy)
+            if (rowDestoy!=null)
             {
+                highlighter.SetTrigger("Off");
                 actionAllowed = false;
                 HideSelection();
                 DestroyRow(offsetPosition);
-                rowDestoy = false;
+                rowDestoy--;
+                rowDestoy = null;
             }
             else if (firstPosition != invalidPosition && IsNeighbours(firstPosition, offsetPosition))
             {
@@ -208,12 +249,12 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         if (!tileMap.IsValid(position))
             return;
 
-        HashSet<Vector3> row = new HashSet<Vector3>(); 
+        Match.DestructableTiles row = new Match.DestructableTiles(0, (int)position.y, tileMap.width - 1); 
         for (int x = 0; x < tileMap.width; x++)
         {
             Vector2 pos = new Vector2(x, position.y);
             tileMap.GetTile(pos).invalid = true;
-            row.Add(pos);
+            row.destructionList.Add(pos);
         }
 
         StartCoroutine(Processing(row));
@@ -242,23 +283,23 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     {
         SetPosition(eventData.pointerCurrentRaycast.worldPosition);
     }
-    private IEnumerator Processing(HashSet<Vector3> destroy)
+    private IEnumerator Processing(Match.DestructableTiles destroy)
     {
-        if (destroy == null || destroy.Count == 0)
+        if (destroy == null || destroy.destructionList.Count == 0)
             yield break;
 
         processing++;
         comboCount++;
-        foreach (var p in destroy)
+        foreach (var p in destroy.destructionList)
         {
             Tile item = tileMap.GetTile(p);
             tileMap.SpawnDead(item.tileType, item.transform);
             item.DestroyContent();
         }
         
-        if (destroy.Count > 0)
+        if (destroy.destructionList.Count > 0)
         {
-            int currentScore = Enumerable.Range(0, destroy.Count - 3).Select((index) => index).Sum() + destroy.Count;
+            int currentScore = Enumerable.Range(1, destroy.destructionList.Count - 3).Select((index) => index).Sum() + destroy.destructionList.Count;
             score.AddScore(currentScore);
             soundManager.PlayPop();
         }
@@ -266,9 +307,9 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         yield return new WaitForSeconds(0.2f);
 
         List<Coroutine> dropAll = new List<Coroutine>();
-        for (int x = 0; x < tileMap.width; x++)
+        for (int x = destroy.minX; x <= destroy.maxX; x++)
         {
-                dropAll.Add(StartCoroutine(DropAndReplaceWithNew(x)));
+            dropAll.Add(StartCoroutine(DropAndReplaceWithNew(x, destroy.minY)));
         }
 
         foreach (Coroutine dropTask in dropAll)
@@ -328,12 +369,12 @@ public class Field : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         }
         yield return until;
     }
-    private IEnumerator DropAndReplaceWithNew(int x)
+    private IEnumerator DropAndReplaceWithNew(int x, int fromY)
     {
         List<Coroutine> animations = new List<Coroutine>();
         int destroyedCount = 0;
 
-        for (int y = 0; y < tileMap.height; y++)
+        for (int y = fromY; y < tileMap.height; y++)
         {
             Tile tile = tileMap.GetTile(x, y);
             if (tile.content == null)

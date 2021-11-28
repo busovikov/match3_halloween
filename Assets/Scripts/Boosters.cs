@@ -30,11 +30,12 @@ public class Boosters : MonoBehaviour
         public int price;
         public float cooldown = 10;
 
-        public delegate void ActivateBoosterCallback(BoosterType booster);
+        public delegate void BoosterCallback(Booster booster);
         private StringBuilder stringBuilder = new StringBuilder(10);
 
         private float timer = 0;
-        private ActivateBoosterCallback activate;
+        private BoosterCallback activate;
+        private BoosterCallback release;
 
         private string Name()
         {
@@ -45,31 +46,28 @@ public class Boosters : MonoBehaviour
 
         public void Save()
         {
-            PlayerPrefs.SetInt(Name(), amount);
+            Config.SaveInt(Name(), amount);
         }
 
         public void Load()
         {
-            if (PlayerPrefs.HasKey(Name()))
-            {
-                amount = PlayerPrefs.GetInt(Name());
-            }
+            Config.LoadInt(Name(), out amount, amount);
             UpdateLable();
         }
 
-        public void Fill(Transform child, ActivateBoosterCallback cb)
+        public void Fill(Transform child, BoosterCallback activate_call, BoosterCallback release_call)
         {
             btn = child.GetComponent<Button>();
             label = btn.transform.GetChild(0).GetComponent<Text>();
             animation = child.GetComponent<Animator>();
-            activate = cb;
+            activate = activate_call;
+            release = release_call;
             btn.onClick.AddListener(delegate (){
                 if (amount > 0)
                 {
                     timer = cooldown;
                     btn.interactable = false;
-                    Dec();
-                    activate(type);
+                    activate(this);
                 }
             });
             timer = 0.1f;
@@ -83,6 +81,7 @@ public class Boosters : MonoBehaviour
                 if(timer <= 0)
                 {
                     btn.interactable = amount > 0;
+                    release(this);
                 }
             }
         }
@@ -153,12 +152,12 @@ public class Boosters : MonoBehaviour
     public Booster[] boosters;
     Dictionary<BoosterType, int> lookupTable = new Dictionary<BoosterType, int>();
 
-    public void InitBoosters(Booster.ActivateBoosterCallback cb)
+    public void InitBoosters(Booster.BoosterCallback activate, Booster.BoosterCallback release)
     {
         int size = Mathf.Min(transform.childCount, boosters.Length);
         for (int i = 0; i < size; i++)
         {
-            boosters[i].Fill(transform.GetChild(i), cb);
+            boosters[i].Fill(transform.GetChild(i), activate, release);
             boosters[i].Load();
             lookupTable[boosters[i].type] = i;
         }

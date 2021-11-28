@@ -6,20 +6,31 @@ using UnityEngine;
 public class Match 
 {
     private TileMap tiles;
-    private List<Vector3> toBeDestroyed;
     private List<Vector3> setX;
     private List<Vector3>[] setY;
 
     public bool bisy = false;
+
+    public class DestructableTiles
+    {
+        public int minX;
+        public int minY;
+        public int maxX;
+        public HashSet<Vector3> destructionList;
+
+        public DestructableTiles(int minX, int minY, int maxX)
+        {
+            this.minX = minX;
+            this.minY = minY;
+            this.maxX = maxX;
+            this.destructionList = new HashSet<Vector3>();
+        }
+    }
+
     public Match(TileMap tilesMap)
     {
         tiles = tilesMap;
-        toBeDestroyed = new List<Vector3>(tiles.width * tiles.height);
         InitSets();
-    }
-    public bool ToBeDestroyed()
-    {
-        return toBeDestroyed.Count > 0;
     }
 
     public bool SwapsAvailable()
@@ -84,36 +95,31 @@ public class Match
         }
     }
 
-    public bool IsAny(out HashSet<Vector3> destructionList)
+    public bool IsAny(out DestructableTiles destructableTiles)
     {
-        destructionList = null;
+        destructableTiles = new DestructableTiles(int.MaxValue, int.MaxValue, 0);
         for (int y = 0; y < tiles.height; y++)
         {
             for (int x = 0; x < tiles.width; x++)
             {
-                StackOn(x, y, setX);
-                StackOn(x, y, setY[x]);
-                
+                StackOn(x, y, setX, destructableTiles);
+                StackOn(x, y, setY[x], destructableTiles);
+                if (y == tiles.height - 1)
+                {
+                    Sink(setY[x], destructableTiles);
+                }
             }
-            Sink(setX);
+            Sink(setX, destructableTiles);
         }
-        for (int x = 0; x < tiles.width; x++)
-            Sink(setY[x]);
         
-        if (ToBeDestroyed())
-        {
-            destructionList = new HashSet<Vector3>(toBeDestroyed);
-            toBeDestroyed.Clear();
-            return true;
-        }
-        return false;
+         return destructableTiles.destructionList.Count > 0;
     }
-    private void StackOn(int x, int y, List<Vector3> set)
+    private void StackOn(int x, int y, List<Vector3> set, DestructableTiles destructableTiles)
     {
         int type = tiles.GetType(x, y);
         if (set.Count > 0 && set[0].z != type) // Store type in z to avoid checking for validity
         {
-            Sink(set);
+            Sink(set, destructableTiles);
         }
         if (tiles.IsValid(x, y))
         {
@@ -121,12 +127,27 @@ public class Match
         }
     }
 
-    private void Sink(List<Vector3> set)
+    private void Sink(List<Vector3> set, DestructableTiles destructableTiles)
     {
         if (set.Count >= 3)
         {
-            foreach (Vector3 v in set) { tiles.GetTile(v).invalid = true; }
-            toBeDestroyed.AddRange(set);
+            foreach (Vector3 v in set) 
+            { 
+                tiles.GetTile(v).invalid = true;
+                if (v.x > destructableTiles.maxX)
+                {
+                    destructableTiles.maxX = (int)v.x;
+                }
+                if (v.x < destructableTiles.minX)
+                {
+                    destructableTiles.minX = (int)v.x;
+                }
+                if (v.y < destructableTiles.minY)
+                {
+                    destructableTiles.minY = (int)v.y;
+                }
+            }
+            destructableTiles.destructionList.UnionWith(set);
         }
         set.Clear();
     }

@@ -40,7 +40,7 @@ QualitySettings:
     asyncUploadBufferSize: 16
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
-    customRenderPipeline: {fileID: 0}
+    customRenderPipeline: {fileID: 11400000, guid: b8728041c9b290e48924b64fde9a0ea7, type: 2}
     excludedTargetPlatforms: []
   - serializedVersion: 2
     name: High
@@ -119,6 +119,7 @@ QualitySettings:
     Lumin: 2
     Nintendo Switch: 2
     PS4: 2
+    Server: 0
     Stadia: 2
     Standalone: 2
     WebGL: 1

@@ -105,7 +105,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1
   m_Sprite: {fileID: -5177388603050735206, guid: 71ebafeef3c03457483266a33ab2b270, type: 3}
-  m_Color: {r: 0.15471691, g: 0.7050315, b: 1, a: 0.11764706}
+  m_Color: {r: 0.3019608, g: 0.3372549, b: 0.4117647, a: 0.19215687}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -189,7 +189,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -2
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.11764706, g: 0.101960786, b: 0.19607843, a: 0.78431374}
+  m_Color: {r: 0.12977926, g: 0.15650241, b: 0.21698111, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -252,7 +252,6 @@ MonoBehaviour:
   content: {fileID: 0}
   toEngulf: []
   tileType: 0
-  invalid: 1
   up: {fileID: 0}
   down: {fileID: 0}
   left: {fileID: 0}

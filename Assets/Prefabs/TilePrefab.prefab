@@ -105,7 +105,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1
   m_Sprite: {fileID: -5177388603050735206, guid: 71ebafeef3c03457483266a33ab2b270, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.2}
+  m_Color: {r: 0.5415094, g: 0.6873928, b: 1, a: 0.2}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -253,6 +253,11 @@ MonoBehaviour:
   content: {fileID: 0}
   blockedContent: {fileID: 0}
   toEngulf: []
+  tileType:
+    spetial: 0
+    main: 0
+    blocked: 0
+    background: 0
   up: {fileID: 0}
   down: {fileID: 0}
   left: {fileID: 0}

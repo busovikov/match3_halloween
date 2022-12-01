@@ -5,4 +5,7 @@ public class Yandex : MonoBehaviour
     [DllImport("__Internal")]
     public static extern void ShowFullScreenAdv();
 
+    [DllImport("__Internal")]
+    public static extern void RateGame();
+
 }

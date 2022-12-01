@@ -13,6 +13,21 @@ mergeInto(LibraryManager.library, {
 })
   },
 
+  RateGame: function () {
+    console.log("try to rate");
+    ysdk.feedback.canReview()
+        .then(({ value, reason }) => {
+            if (value) {
+                ysdk.feedback.requestReview()
+                    .then(({ feedbackSent }) => {
+                        console.log(feedbackSent);
+                    })
+            } else {
+                console.log(reason)
+            }
+        })
+  },
+
   GetLang: function () {
     var returnStr = ysdk.environment.i18n.lang;
     var bufferSize = lengthBytesUTF8(returnStr) + 1;

@@ -3,6 +3,6 @@ using System.Runtime.InteropServices;
 public class Yandex : MonoBehaviour
 {
     [DllImport("__Internal")]
-    private static extern void Hello();
+    public static extern void ShowFullScreenAdv();
 
 }

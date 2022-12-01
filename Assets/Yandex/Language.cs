@@ -9,6 +9,7 @@ public class Language : MonoBehaviour
     public LangObject tr;
     static public LangObject current;
 
+    public Text language;
 
     public Text _menu_play_time;
     public Text _menu_play_moves;
@@ -18,7 +19,7 @@ public class Language : MonoBehaviour
     public Text _menu_play_menu;
     public Text _menu_play_next;
     public Text _menu_play_repeate;
-           
+
     public Text _hud_score_label;
     public Text _popup_score_label;
     public Text _popup_best_label;
@@ -32,14 +33,17 @@ public class Language : MonoBehaviour
 
     public void ChangeLang()
     {
+        string lang;
 #if UNITY_EDITOR
-        string lang = "ru";
+        lang = "tr";
 #else
-    #if UNITY_WEBGL
-         string lang = GetLang();
-    #endif
+#if PLATFORM_WEBGL
+        lang = GetLang();
 #endif
-        if (lang == "ru")
+#endif
+        if (language) language.text = lang;
+
+        if (lang == "ru" || lang == "be" || lang == "kk" || lang == "uk" || lang == "uz")
         {
             current = ru;
         }

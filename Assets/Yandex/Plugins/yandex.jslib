@@ -28,6 +28,17 @@ mergeInto(LibraryManager.library, {
         })
   },
 
+  IsPlayerAuthorized: function (){
+    var auth = player.getMode() === 'lite';
+      console.log("is player Authorized");
+      console.log(auth);
+      return auth;
+  },
+
+  AuthorizePlayer: function (){
+    auth();
+  },
+
   GetLang: function () {
     var returnStr = ysdk.environment.i18n.lang;
     var bufferSize = lengthBytesUTF8(returnStr) + 1;

@@ -31,11 +31,14 @@ public class Language : MonoBehaviour
     public Text _popup_win_label;
     public Text _popup_lose_label;
 
+    public Text _auth_label;
+    public Text _open_bonus_chest;
+
     public void ChangeLang()
     {
         string lang;
 #if UNITY_EDITOR
-        lang = "tr";
+        lang = "ru";
 #else
 #if PLATFORM_WEBGL
         lang = GetLang();
@@ -79,7 +82,10 @@ public class Language : MonoBehaviour
         if (null != _hud_level_label) _hud_level_label.text = current._hud_level_label;
         if (null != _hud_play_time) _hud_play_time.text = current._hud_play_time;
         if (null != _hud_play_moves) _hud_play_moves.text = current._hud_play_moves;
-    }
+
+        if (null != _auth_label) _auth_label.text = current._auth_label;
+        if (null != _open_bonus_chest) _open_bonus_chest.text = current._open_bonus_chest;
+}
 
     private void Awake()
     {

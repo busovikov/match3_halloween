@@ -30,9 +30,7 @@ mergeInto(LibraryManager.library, {
 
   IsPlayerAuthorized: function (){
     var auth = player.getMode() === 'lite';
-      console.log("is player Authorized");
-      console.log(auth);
-      return auth;
+      return !auth;
   },
 
   AuthorizePlayer: function (){
@@ -46,5 +44,24 @@ mergeInto(LibraryManager.library, {
     stringToUTF8(returnStr, buffer, bufferSize);
     return buffer;
   },
+
+
+  SaveData: function (object) {
+    var data = UTF8ToString(object);
+    var obj = JSON.parse(data); 
+    player.setData(obj,true).then(() => {
+    });
+  },
+
+  LoadData: function (keys) {
+    var data = UTF8ToString(keys);
+    var obj = JSON.parse(data); 
+      player.getData().then(_data => {
+      const ret = JSON.stringify(_data);
+      myGameInstance.SendMessage('Config','PlayerStatsReceived', ret);
+    });
+  },
+
+  
 
 });

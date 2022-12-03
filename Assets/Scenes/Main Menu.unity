@@ -323,7 +323,6 @@ MonoBehaviour:
   bestMoves: 0
   total: 0
   coin: 0
-  lastAuthBonus: 
 --- !u!4 &42612812
 Transform:
   m_ObjectHideFlags: 0
@@ -3551,19 +3550,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: cadab9c07fe8444129761506daadc571, type: 3}
-    m_FontSize: 70
+    m_Font: {fileID: 12800000, guid: 667972238ba42da47bef9b9121909795, type: 3}
+    m_FontSize: 100
     m_FontStyle: 0
     m_BestFit: 1
-    m_MinSize: 4
-    m_MaxSize: 70
+    m_MinSize: 1
+    m_MaxSize: 100
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u041E\u0442\u043A\u0440\u043E\u0439"
+  m_Text: "\u041E\u0422\u041A\u0420\u042B\u0422\u042C"
 --- !u!224 &6170970337818379132
 RectTransform:
   m_ObjectHideFlags: 0

@@ -18,4 +18,14 @@ public class Yandex : MonoBehaviour
     [DllImport("__Internal")]
     public static extern bool IsPlayerAuthorized();
 
+    [DllImport("__Internal")]
+    public static extern void SaveData(string obj);
+
+    [DllImport("__Internal")]
+    public static extern void LoadData(string obj);
+
+    
+
+
+
 }

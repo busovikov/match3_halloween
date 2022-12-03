@@ -47,13 +47,16 @@
       // Игрок не авторизован.
       ysdk.auth.openAuthDialog().then(() => {
         console.log("Success Auth");
-        initPlayer().catch(err => {
-          // Ошибка при инициализации объекта Player.
+        
+        initPlayer().then(_player => {
+          myGameInstance.SendMessage('Config','PlayerReinitialized');
         });
       }).catch(() => {
         // Игрок не авторизован.
       });
     }
+
+    
   </script>
 
   <script>
@@ -122,12 +125,14 @@
     #endif
     loadingBar.style.display = "block";
 
+    var myGameInstance = null;
     var script = document.createElement("script");
     script.src = loaderUrl;
     script.onload = () => {
       createUnityInstance(canvas, config, (progress) => {
         progressBarFull.style.width = 100 * progress + "%";
       }).then((unityInstance) => {
+        myGameInstance = unityInstance;
         loadingBar.style.display = "none";
         // fullscreenButton.onclick = () => {
         //   unityInstance.SetFullscreen(1);

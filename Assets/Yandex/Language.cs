@@ -34,6 +34,8 @@ public class Language : MonoBehaviour
     public Text _auth_label;
     public Text _open_bonus_chest;
 
+    public Text _developed_by;
+
     public void ChangeLang()
     {
         string lang;
@@ -85,6 +87,8 @@ public class Language : MonoBehaviour
 
         if (null != _auth_label) _auth_label.text = current._auth_label;
         if (null != _open_bonus_chest) _open_bonus_chest.text = current._open_bonus_chest;
+
+        if (null != _developed_by)_developed_by.text = current._developed_by;
 }
 
     private void Awake()

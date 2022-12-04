@@ -24,8 +24,15 @@ public class Yandex : MonoBehaviour
     [DllImport("__Internal")]
     public static extern void LoadData(string obj);
 
-    
 
+    [DllImport("__Internal")]
+    public static extern void SetScoreToLeaderBoard(int val);
+
+    [DllImport("__Internal")]
+    public static extern void SetBestTimeToLeaderBoard(int val);
+
+    [DllImport("__Internal")]
+    public static extern void SetBestMovesToLeaderBoard(int val);
 
 
 }

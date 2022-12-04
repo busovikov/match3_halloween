@@ -4,11 +4,17 @@ mergeInto(LibraryManager.library, {
     ysdk.adv.showFullscreenAdv({
     callbacks: {
         onClose: function(wasShown) {
-          // some action after close
+          myGameInstance.SendMessage('Advert','OnAdvertComplete');
         },
         onError: function(error) {
-          // some action on error
-        }
+          myGameInstance.SendMessage('Advert','OnAdvertComplete');
+        },
+        onOpen : function(error) {
+          console.log("adv is shown");
+        },
+        onOffline : function(error) {
+          myGameInstance.SendMessage('Advert','OnAdvertComplete');
+        },
     }
 })
   },
@@ -62,6 +68,19 @@ mergeInto(LibraryManager.library, {
     });
   },
 
-  
+  SetScoreToLeaderBoard: function (val)
+  {
+    if (lb != null) lb.setLeaderboardScore('Score', val);
+  },
+
+  SetBestTimeToLeaderBoard: function (val)
+  {
+    if (lb != null) lb.setLeaderboardScore('BestTime', val);
+  },
+
+  SetBestMovesToLeaderBoard: function (val)
+  {
+    if (lb != null) lb.setLeaderboardScore('BestMoves', val);
+  },
 
 });

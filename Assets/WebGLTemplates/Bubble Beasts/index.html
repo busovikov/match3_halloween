@@ -29,11 +29,13 @@
       .then(ysdk => {
         console.log('Yandex SDK initialized');
         window.ysdk = ysdk;
-        ysdk.adv.showFullscreenAdv();
         initPlayer();
+        canReview();
+        ysdk.adv.showFullscreenAdv();
       });
 
     var player;
+    var lb;
 
     function initPlayer() {
       return ysdk.getPlayer({ scopes: false }).then(_player => {
@@ -43,6 +45,14 @@
       });
     }
 
+    function canReview()
+    {
+      ysdk.feedback.canReview().then(({ value, reason }) => {
+          myGameInstance.SendMessage('Advert','OnCanReview', value);
+          console.log("rate game: ", reason);
+        });
+    } 
+
     function auth() {
       // Игрок не авторизован.
       ysdk.auth.openAuthDialog().then(() => {
@@ -50,6 +60,7 @@
         
         initPlayer().then(_player => {
           myGameInstance.SendMessage('Config','PlayerReinitialized');
+          ysdk.getLeaderboards().then(_lb => lb = _lb);
         });
       }).catch(() => {
         // Игрок не авторизован.

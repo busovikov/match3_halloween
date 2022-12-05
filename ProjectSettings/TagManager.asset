@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Score
+  - BuyCoins5
+  - BuyCoins20
+  - BuyCoins100
+  - BuyCoinsPopup
   layers:
   - Default
   - TransparentFX

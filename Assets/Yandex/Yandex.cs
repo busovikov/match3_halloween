@@ -19,10 +19,13 @@ public class Yandex : MonoBehaviour
     public static extern bool IsPlayerAuthorized();
 
     [DllImport("__Internal")]
+    public static extern bool IsPlayerAbleReview();
+
+    [DllImport("__Internal")]
     public static extern void SaveData(string obj);
 
     [DllImport("__Internal")]
-    public static extern void LoadData(string obj);
+    public static extern void LoadData();
 
 
     [DllImport("__Internal")]
@@ -33,6 +36,19 @@ public class Yandex : MonoBehaviour
 
     [DllImport("__Internal")]
     public static extern void SetBestMovesToLeaderBoard(int val);
+
+    public enum CoinsOptions
+    { 
+        coins5,
+        coins20,
+        coins100,
+    }
+
+    [DllImport("__Internal")]
+    public static extern void BuyCoins(int val);
+
+    [DllImport("__Internal")]
+    public static extern void ConsumePurchase(string token);
 
 
 }

@@ -34,6 +34,11 @@ public class Language : MonoBehaviour
     public Text _auth_label;
     public Text _open_bonus_chest;
 
+    public Text _purchase_popup_close_button;
+    public Text _purchase_description_coin5;
+    public Text _purchase_description_coin20;
+    public Text _purchase_description_coin100;
+
     public Text _developed_by;
 
     public void ChangeLang()
@@ -89,6 +94,11 @@ public class Language : MonoBehaviour
         if (null != _open_bonus_chest) _open_bonus_chest.text = current._open_bonus_chest;
 
         if (null != _developed_by)_developed_by.text = current._developed_by;
+
+        if (null != _purchase_popup_close_button) _purchase_popup_close_button.text = current._purchase_popup_close_button;
+        if (null != _purchase_description_coin5) _purchase_description_coin5.text = current._purchase_description_coin5;
+        if (null != _purchase_description_coin20) _purchase_description_coin20.text = current._purchase_description_coin20;
+        if (null != _purchase_description_coin100) _purchase_description_coin100.text = current._purchase_description_coin100;
 }
 
     private void Awake()

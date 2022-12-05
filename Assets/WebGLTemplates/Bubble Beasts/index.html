@@ -100,7 +100,9 @@
       // Игрок не авторизован.
       ysdk.auth.openAuthDialog().then(() => {
         console.log("Success Auth");
-        initPlayer().then(_player => { myGameInstance.SendMessage('Config', 'PlayerReinitialized'); });
+        initPlayer().then(_player => { 
+          myGameInstance.SendMessage('Config', 'PlayerReinitialized'); 
+        });
       }).catch(() => {
         // Игрок не авторизован.
       });

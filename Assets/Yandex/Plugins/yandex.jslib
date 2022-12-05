@@ -26,6 +26,7 @@ mergeInto(LibraryManager.library, {
         if (value) {
           ysdk.feedback.requestReview()
             .then(({ feedbackSent }) => {
+              myGameInstance.SendMessage('Advert', 'OnAdvertComplete');
               console.log(feedbackSent);
             })
         } else {
@@ -43,8 +44,8 @@ mergeInto(LibraryManager.library, {
   IsPlayerAbleReview: function () {
     ysdk.feedback.canReview().then(({ value, reason }) => {
       if (myGameInstance)
-        myGameInstance.SendMessage('Advert', 'OnCanReview', value);
-      console.log("canReview: ", reason);
+        myGameInstance.SendMessage('Advert', 'OnCanReview', value ? 1 : 0);
+      console.log("canReview: ", value ? 1 : 0, reason);
     });
   },
 

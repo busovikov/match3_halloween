@@ -9,6 +9,92 @@
   <link rel="stylesheet" href="TemplateData/style.css">
   <!-- Yandex Games SDK -->
   <script src="https://yandex.ru/games/sdk/v2"></script>
+  <script>
+    YaGames.init().then(ysdk => {
+     console.log('Yandex SDK initialized');
+     window.ysdk = ysdk;
+     initPayments();
+     initLeaderBoard();
+     ysdk.adv.showFullscreenAdv();
+   });
+
+   var player;
+   var lb;
+   var payments = null;
+   var isPlayerNotAuth = false;
+
+   function initializePlayer() {
+     return ysdk.getPlayer({ scopes: true }).then(_player => {
+       console.log("Init Player");
+       player = _player;
+       isPlayerNotAuth = player.getMode() === 'lite';
+       myGameInstance.SendMessage('Yandex', 'OnPlayerInitialized', isPlayerNotAuth ? 0 : 1 );
+       return player;
+     });
+   }
+
+   
+
+   function initLeaderBoard() {
+    ysdk.getLeaderboards().then(_lb => {
+    lb = _lb;
+    console.log("leaderBoard initiated");
+    });
+   }
+
+   function SendPurchase(coins, token) {
+     var res = { "number": coins, "token": token };
+     myGameInstance.SendMessage('ScoreManager', 'AddCoinScoreJson', JSON.stringify(res));
+   }
+
+   function HandleOldPurchase(purchase) {
+     console.log("unhandled purchase: ", purchase);
+     if (purchase.productID === 'coins5') {
+       SendPurchase(5, purchase.purchaseToken);
+     }
+     else if (purchase.productID === 'coins20') {
+       SendPurchase(20, purchase.purchaseToken);
+     }
+     else if (purchase.productID === 'coins100') {
+       SendPurchase(100, purchase.purchaseToken);
+     }
+   }
+
+   function initPayments() {
+     ysdk.getPayments({ signed: true }).then(_payments => {
+       // Покупки доступны.
+       payments = _payments;
+     }).catch(err => {
+       console.log("payments error");
+     });
+   }
+
+   function LoadPlayerData() {
+       player.getData().then(_data => {
+         const ret = JSON.stringify(_data);
+         myGameInstance.SendMessage('Config', 'PlayerStatsReceived', ret);
+       });
+   }
+
+   function auth() {
+     // Игрок не авторизован.
+     ysdk.auth.openAuthDialog().then(() => {
+      console.log("Success Auth");
+      ysdk.getPlayer({ scopes: true }).then(_player => {
+       console.log("Got new Player");
+       player = _player;
+       player.getData().then(_data => {
+         const ret = JSON.stringify(_data);
+         myGameInstance.SendMessage('Config', 'PlayerStatsReceived', ret);
+         myGameInstance.SendMessage('Yandex', 'OnPlayerAuthorization', 1); 
+       });
+      });
+      
+     }).catch(() => {
+       myGameInstance.SendMessage('Yandex', 'OnPlayerAuthorization', 0);
+     });
+   }
+  </script>
 </head>
 
 <body>
@@ -22,95 +108,6 @@
     </div>
     <div id="unity-warning"> </div>
   </div>
-
-  <script>
-    YaGames
-      .init()
-      .then(ysdk => {
-        console.log('Yandex SDK initialized');
-        window.ysdk = ysdk;
-        initPlayer();
-        initPayments();
-        initLeaderBoard();
-        ysdk.adv.showFullscreenAdv();
-      });
-
-    var player;
-    var lb;
-    var payments = null;
-
-    function initLeaderBoard()
-    {
-      ysdk.getLeaderboards().then(_lb =>{
-         lb = _lb;
-         console.log("leaderBoard initiated");
-        });
-    }
-
-
-    function SendPurchase(coins, token)
-    {
-      var res = {"number":coins,"token":token};
-      myGameInstance.SendMessage('ScoreManager', 'AddCoinScoreJson', JSON.stringify(res));
-    }
-
-    function HandleOldPurchase(purchase) {
-      console.log("unhandled purchase: ", purchase);
-      if (purchase.productID === 'coins5') {
-        SendPurchase( 5, purchase.purchaseToken);
-      }
-      else if (purchase.productID === 'coins20') {
-        SendPurchase(20, purchase.purchaseToken);
-      }
-      else if (purchase.productID === 'coins100') {
-        SendPurchase(100, purchase.purchaseToken);
-      }
-    }
-
-    function initPayments() {
-      ysdk.getPayments({ signed: true }).then(_payments => {
-        // Покупки доступны.
-        payments = _payments;
-      }).catch(err => {
-        console.log("payments error");
-      });
-    }
-
-    function LoadPlayerData()
-    {
-      initPlayer().then(_player => {
-        _player.getData().then(_data => {
-        const ret = JSON.stringify(_data);
-        myGameInstance.SendMessage('Config', 'PlayerStatsReceived', ret);
-        });
-      });
-    }
-
-    function initPlayer() {
-      return ysdk.getPlayer({ scopes: true }).then(_player => {
-        console.log("Init Player");
-        player = _player;
-        return player;
-      });
-    }
-
-    
-
-    function auth() {
-      // Игрок не авторизован.
-      ysdk.auth.openAuthDialog().then(() => {
-        console.log("Success Auth");
-        initPlayer().then(_player => { 
-          myGameInstance.SendMessage('Config', 'PlayerReinitialized'); 
-        });
-      }).catch(() => {
-        // Игрок не авторизован.
-      });
-    }
-
-
-  </script>
-
   <script>
     var container = document.querySelector("#unity-container");
     var canvas = document.querySelector("#unity-canvas");
@@ -178,6 +175,7 @@
     loadingBar.style.display = "block";
 
     var myGameInstance = null;
+
     var script = document.createElement("script");
     script.src = loaderUrl;
     script.onload = () => {
@@ -185,15 +183,14 @@
         progressBarFull.style.width = 100 * progress + "%";
       }).then((unityInstance) => {
         myGameInstance = unityInstance;
-        
+       
         loadingBar.style.display = "none";
         // fullscreenButton.onclick = () => {
         //   unityInstance.SetFullscreen(1);
         // };
-      }).catch((message) => {
-        alert(message);
-      });
+      }).catch((message) => {alert(message);});
     };
+      
     document.body.appendChild(script);
   </script>
 </body>

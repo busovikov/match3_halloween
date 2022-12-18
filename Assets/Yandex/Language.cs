@@ -41,16 +41,9 @@ public class Language : MonoBehaviour
 
     public Text _developed_by;
 
-    public void ChangeLang()
+    public void ChangeLang(string lang)
     {
-        string lang;
-#if UNITY_EDITOR
-        lang = "ru";
-#else
-#if PLATFORM_WEBGL
-        lang = GetLang();
-#endif
-#endif
+
         if (language) language.text = lang;
 
         if (lang == "ru" || lang == "be" || lang == "kk" || lang == "uk" || lang == "uz")
@@ -101,13 +94,21 @@ public class Language : MonoBehaviour
         if (null != _purchase_description_coin100) _purchase_description_coin100.text = current._purchase_description_coin100;
 }
 
-    private void Awake()
+    private void Start()
     {
-        ChangeLang();
+        string lang = "en";
+#if PLATFORM_WEBGL && !UNITY_EDITOR
+        lang = Yandex.GetLang();
+#endif
+        ChangeLang(lang);
         UpdateText();
     }
 
-    [DllImport("__Internal")]
-    private static extern string GetLang();
+    public void ReceivedLanguage(string lang)
+    {
+        Debug.Log("ReceivedLanguage");
+        ChangeLang(lang);
+        UpdateText();
+    }
 
 }

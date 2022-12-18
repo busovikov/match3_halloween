@@ -1,56 +1,26 @@
 mergeInto(LibraryManager.library, {
 
+  InitPlayer: function (){
+    initializePlayer();
+  },
+
   ShowFullScreenAdv: function () {
-    ysdk.adv.showFullscreenAdv({
+    console.log("ShowFullScreenAdv");
+    adv = ysdk.adv.showFullscreenAdv({
       callbacks: {
         onClose: function (wasShown) {
           myGameInstance.SendMessage('Advert', 'OnAdvertComplete');
         },
         onError: function (error) {
           myGameInstance.SendMessage('Advert', 'OnAdvertComplete');
-        },
-        onOpen: function (error) {
-          console.log("adv is shown");
-        },
-        onOffline: function (error) {
-          myGameInstance.SendMessage('Advert', 'OnAdvertComplete');
-        },
+        }
       }
     })
+    console.log("adv obj: ",adv);
   },
 
-  RateGame: function () {
-    console.log("try to rate");
-    ysdk.feedback.canReview()
-      .then(({ value, reason }) => {
-        if (value) {
-          ysdk.feedback.requestReview()
-            .then(({ feedbackSent }) => {
-              myGameInstance.SendMessage('Advert', 'OnAdvertComplete');
-              console.log(feedbackSent);
-            })
-        } else {
-          console.log(reason)
-        }
-      })
-  },
-
-  IsPlayerAuthorized: function () {
-    console.log("player mode",player.getMode());
-    var auth = player.getMode() === 'lite';
-    return !auth;
-  },
-
-  IsPlayerAbleReview: function () {
-    ysdk.feedback.canReview().then(({ value, reason }) => {
-      if (myGameInstance)
-        myGameInstance.SendMessage('Advert', 'OnCanReview', value ? 1 : 0);
-      console.log("canReview: ", value ? 1 : 0, reason);
-    });
-  },
-
-  AuthorizePlayer: function () {
-    auth();
+  GetNoAuth: function (){
+    return player.getMode() === 'lite';
   },
 
   GetLang: function () {
@@ -59,8 +29,35 @@ mergeInto(LibraryManager.library, {
     var buffer = _malloc(bufferSize);
     stringToUTF8(returnStr, buffer, bufferSize);
     return buffer;
+   },
+  
+  CanReview: function () {
+    ysdk.feedback.canReview().then(({ value, reason }) => {
+      myGameInstance.SendMessage('Advert', 'OnCanReview', value ? 1 : 0);
+      console.log("canReview: ", value ? 1 : 0, reason);
+      });
   },
 
+  RateGame: function () {
+    console.log("try to rate");
+    ysdk.feedback.canReview()
+      .then(({ value, reason }) => {
+        console.log("canReview: ", value ? 1 : 0, reason);
+        if (value) {
+          ysdk.feedback.requestReview()
+            .then(({ feedbackSent }) => {
+              myGameInstance.SendMessage('Advert', 'OnAdvertComplete');
+              console.log(feedbackSent);
+            })
+        } else {
+          myGameInstance.SendMessage('Advert', 'OnAdvertComplete');
+        }
+      })
+  },
+
+  AuthorizePlayer: function () {
+    auth();
+  },
 
   SaveData: function (object) {
     var data = UTF8ToString(object);
@@ -98,10 +95,6 @@ mergeInto(LibraryManager.library, {
       else
         console.log("leadebord unavailable: ", val);
     });
-  },
-
-  addGold: function (val) {
-    return player.incrementStats({ gold: value });
   },
 
   ConsumePurchase: function (val){

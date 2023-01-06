@@ -48,9 +48,11 @@ mergeInto(LibraryManager.library, {
             .then(({ feedbackSent }) => {
               myGameInstance.SendMessage('Advert', 'OnAdvertComplete');
               console.log(feedbackSent);
+              window.focus();
             })
         } else {
           myGameInstance.SendMessage('Advert', 'OnAdvertComplete');
+          window.focus();
         }
       })
   },
@@ -82,7 +84,9 @@ mergeInto(LibraryManager.library, {
   SetBestTimeToLeaderBoard: function (val) {
     ysdk.isAvailableMethod('leaderboards.setLeaderboardScore').then(res => {
       if (res)
-      ysdk.getLeaderboards().then(lb => {lb.setLeaderboardScore('BestTime', val)});
+      ysdk.getLeaderboards().then(lb => {
+        setTimeout(() => lb.setLeaderboardScore('BestTime', val), 1050);
+      });
       else
         console.log("leadebord unavailable: ", val);
     });
@@ -91,7 +95,9 @@ mergeInto(LibraryManager.library, {
   SetBestMovesToLeaderBoard: function (val) {
     ysdk.isAvailableMethod('leaderboards.setLeaderboardScore').then(res => {
       if (res)
-        ysdk.getLeaderboards().then(lb => {lb.setLeaderboardScore('BestMoves', val)});
+        ysdk.getLeaderboards().then(lb => {
+          setTimeout(() => lb.setLeaderboardScore('BestMoves', val), 1050);
+        });
       else
         console.log("leadebord unavailable: ", val);
     });

@@ -31,6 +31,9 @@ public class Language : MonoBehaviour
     public Text _popup_win_label;
     public Text _popup_lose_label;
 
+    public Text _popup_start_collect;
+    public Text _popup_start_button_start;
+
     public Text _auth_label;
     public Text _open_bonus_chest;
 
@@ -82,6 +85,9 @@ public class Language : MonoBehaviour
         if (null != _hud_level_label) _hud_level_label.text = current._hud_level_label;
         if (null != _hud_play_time) _hud_play_time.text = current._hud_play_time;
         if (null != _hud_play_moves) _hud_play_moves.text = current._hud_play_moves;
+
+        if (null != _popup_start_collect) _popup_start_collect.text = current._popup_start_collect;
+        if (null != _popup_start_button_start) _popup_start_button_start.text = current._popup_start_button_start;
 
         if (null != _auth_label) _auth_label.text = current._auth_label;
         if (null != _open_bonus_chest) _open_bonus_chest.text = current._open_bonus_chest;

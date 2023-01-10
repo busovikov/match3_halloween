@@ -29,6 +29,7 @@
     YaGames.init().then(ysdk => {
      console.log('Yandex SDK initialized');
      window.ysdk = ysdk;
+     initializePlayer();
      initPayments();
      initLeaderBoard();
      ysdk.adv.showFullscreenAdv();
@@ -40,7 +41,7 @@
    var isPlayerNotAuth = false;
 
    function initializePlayer() {
-     return ysdk.getPlayer({ scopes: true }).then(_player => {
+     return ysdk.getPlayer({ scopes: false }).then(_player => {
        console.log("Init Player");
        player = _player;
        isPlayerNotAuth = player.getMode() === 'lite';
